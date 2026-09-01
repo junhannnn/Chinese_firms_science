@@ -16,8 +16,8 @@ full private raw-data workspace.
 
 The file-level inventory is in `processed_data_manifest.csv`. In the current
 public copy, the included process-data layer contains 24 files under
-`stata_output/`, totaling about 1.11 GB in decimal units. Several large panels
-are included as `.dta.zip` files. There are no data files currently included
+`stata_output/`, totaling about 0.57 GB in decimal units. Several large panels
+are included as `.zip` archives. There are no data files currently included
 under `proc_output/`; that folder is retained as the expected location for
 regenerated Python process outputs.
 
@@ -38,7 +38,7 @@ regenerated Python process outputs.
 
 ## Reproduction Boundary
 
-Unzip any included `.dta.zip` files, then use the included `stata_output/` data
+Unzip any included `.zip` archives, then use the included `stata_output/` data
 to rerun the release-supported Stata analysis stages identified in
 `submission_readiness_review_20260626.md`, and compare against `figure_output/`
 and `table_output/`.

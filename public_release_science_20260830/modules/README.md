@@ -14,10 +14,11 @@ part of the CNKI preprocessing chain, not the analysis-stage Stata workflows in
 ## How To Read This Folder
 
 The default public reproduction path for the release starts from the selected
-process data already included under `../proc_output/` and `../stata_output/`.
-Reviewers do not need to rerun every notebook in this folder to inspect or rerun
-the main analysis-stage code. Treat this folder as the upstream code record for
-how the process-data layer was constructed.
+process data included under `../stata_output/`. The `../proc_output/` directory
+is retained as a destination for regenerated Python outputs but contains no data
+files in this public copy. Reviewers do not need to rerun every notebook in this
+folder to inspect or rerun the main analysis-stage code. Treat this folder as
+the upstream code record for how the process-data layer was constructed.
 
 Full raw-data reconstruction requires external data described in
 `../docs/raw_data_inventory.md` and the relative paths in `../config/dataset.yml`.

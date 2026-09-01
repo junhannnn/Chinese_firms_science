@@ -10,9 +10,9 @@ data pipeline or the Stata analyses.
 - Raw data are not included. The expected raw-data locations are documented in
   `raw_data_inventory.md`.
 - The selected process-data layer is limited to 24 analysis-ready files under
-  `stata_output/`, totaling about 1.11 GB in decimal units; it includes the
+  `stata_output/`, totaling about 0.57 GB in decimal units; it includes the
   CEM-matched listed-firm panels used by the CN patent-science, CNKI, and WOS
-  analysis scripts, and several other large panels are bundled as `.dta.zip`
+  analysis scripts, and several large panels are bundled as `.zip`
   files.
 - No data files are currently included under `proc_output/`; that folder is a
   documented destination for regenerated Python process outputs.
@@ -51,7 +51,7 @@ Then rerun the `--check` command.
 ## Reproduction Guidance
 
 For reproduction from the public bundle, begin with the included
-analysis-ready `stata_output/` files, after unzipping any bundled `.dta.zip`
+analysis-ready `stata_output/` files, after unzipping any bundled `.zip`
 files, and the Stata analysis code under
 `analytics/`. Do not assume every archival or upstream `00_run_all*.do` file can
 be run from the bundled data alone.
