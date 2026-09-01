@@ -1,0 +1,7 @@
+.DS_Store
+**/.DS_Store
+.env
+config/openai_api_key.txt
+**/.ipynb_checkpoints/
+**/__pycache__/
+*.py[cod]

@@ -1,0 +1,430 @@
+{\rtf1\ansi\deff0 {\fonttbl{\f0\fnil Garamond;}}
+{\info {\author .}{\company .}{\title .}}
+\deflang1033\plain\fs20
+{\footer\pard\qc\plain\f0\fs20\chpgn\par}
+{
+{\fs20\b\qc\line Summary statistics }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx3080
+\fs20\pard\intbl\qr { }\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx4300
+\fs20\pard\intbl\qr {{ N}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx5520
+\fs20\pard\intbl\qr {{ Mean}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx6740
+\fs20\pard\intbl\qr {{ SD}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx7960
+\fs20\pard\intbl\qr {{ Min}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx9180
+\fs20\pard\intbl\qr {{ Max}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ f cite science num}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.139}}\cell
+\cellx6740
+\qr {{3.322}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{1399}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ f cite cn sci num}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.131}}\cell
+\cellx6740
+\qr {{3.134}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{1345}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ f cite foreign sci~m}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.03}}\cell
+\cellx6740
+\qr {{0.917}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{506}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ f cite us sci num}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.009}}\cell
+\cellx6740
+\qr {{0.285}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{166}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ f cite nonus forei~m}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.023}}\cell
+\cellx6740
+\qr {{0.708}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{381}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ did}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{0}}\cell
+\cellx6740
+\qr {{0.012}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{1}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ whether pat}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.238}}\cell
+\cellx6740
+\qr {{0.426}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{1}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ state owned}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.049}}\cell
+\cellx6740
+\qr {{0.216}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{1}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3080
+\fs20\pard\intbl\ql {{ before patent}}\cell
+\cellx4300
+\qr {{2739581}}\cell
+\cellx5520
+\qr {{.828}}\cell
+\cellx6740
+\qr {{12.235}}\cell
+\cellx7960
+\qr {{0}}\cell
+\cellx9180
+\qr {{2764.222}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\clbrdrb\brdrw15\brdrs\cellx3080
+\fs20\pard\intbl\ql {{ before sci patent}}\cell
+\clbrdrb\brdrw15\brdrs\cellx4300
+\qr {{2739581}}\cell
+\clbrdrb\brdrw15\brdrs\cellx5520
+\qr {{.136}}\cell
+\clbrdrb\brdrw15\brdrs\cellx6740
+\qr {{2.314}}\cell
+\clbrdrb\brdrw15\brdrs\cellx7960
+\qr {{0}}\cell
+\clbrdrb\brdrw15\brdrs\cellx9180
+\qr {{725.231}}\cell
+\row}
+
+
+\sectd \lndscpsxn\pgwsxn16840\pghsxn11901
+{\fs20\b\qc\line Matrix of correlations }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx3520
+\fs20\pard\intbl\ql { {Variables}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx4238
+\fs20\pard\intbl\qr { {(1)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx4956
+\fs20\pard\intbl\qr { {(2)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx5674
+\fs20\pard\intbl\qr { {(3)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx6392
+\fs20\pard\intbl\qr { {(4)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx7110
+\fs20\pard\intbl\qr { {(5)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx7828
+\fs20\pard\intbl\qr { {(6)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx8546
+\fs20\pard\intbl\qr { {(7)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx9264
+\fs20\pard\intbl\qr { {(8)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx9982
+\fs20\pard\intbl\qr { {(9)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx10700
+\fs20\pard\intbl\qr { {(10)}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(1) f_cite_science~m}}\cell
+\cellx4238
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(2) f_cite_cn_sci_~m}}\cell
+\cellx4238
+\qr {{0.999}}\cell
+\cellx4956
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(3) f_cite_foreign~m}}\cell
+\cellx4238
+\qr {{0.898}}\cell
+\cellx4956
+\qr {{0.879}}\cell
+\cellx5674
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(4) f_cite_us_sci_~m}}\cell
+\cellx4238
+\qr {{0.828}}\cell
+\cellx4956
+\qr {{0.810}}\cell
+\cellx5674
+\qr {{0.942}}\cell
+\cellx6392
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(5) f_cite_nonus_f~m}}\cell
+\cellx4238
+\qr {{0.896}}\cell
+\cellx4956
+\qr {{0.877}}\cell
+\cellx5674
+\qr {{0.993}}\cell
+\cellx6392
+\qr {{0.901}}\cell
+\cellx7110
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(6) did}}\cell
+\cellx4238
+\qr {{0.075}}\cell
+\cellx4956
+\qr {{0.072}}\cell
+\cellx5674
+\qr {{0.095}}\cell
+\cellx6392
+\qr {{0.095}}\cell
+\cellx7110
+\qr {{0.092}}\cell
+\cellx7828
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(7) whether_pat}}\cell
+\cellx4238
+\qr {{0.075}}\cell
+\cellx4956
+\qr {{0.075}}\cell
+\cellx5674
+\qr {{0.058}}\cell
+\cellx6392
+\qr {{0.056}}\cell
+\cellx7110
+\qr {{0.058}}\cell
+\cellx7828
+\qr {{0.018}}\cell
+\cellx8546
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(8) state_owned}}\cell
+\cellx4238
+\qr {{0.046}}\cell
+\cellx4956
+\qr {{0.047}}\cell
+\cellx5674
+\qr {{0.025}}\cell
+\cellx6392
+\qr {{0.021}}\cell
+\cellx7110
+\qr {{0.025}}\cell
+\cellx7828
+\qr {{0.021}}\cell
+\cellx8546
+\qr {{0.072}}\cell
+\cellx9264
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(9) before_patent}}\cell
+\cellx4238
+\qr {{0.651}}\cell
+\cellx4956
+\qr {{0.654}}\cell
+\cellx5674
+\qr {{0.552}}\cell
+\cellx6392
+\qr {{0.532}}\cell
+\cellx7110
+\qr {{0.542}}\cell
+\cellx7828
+\qr {{0.032}}\cell
+\cellx8546
+\qr {{0.056}}\cell
+\cellx9264
+\qr {{0.053}}\cell
+\cellx9982
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3520
+\fs20\pard\intbl\ql { {(10) before_sci_pa~t}}\cell
+\cellx4238
+\qr {{0.737}}\cell
+\cellx4956
+\qr {{0.748}}\cell
+\cellx5674
+\qr {{0.579}}\cell
+\cellx6392
+\qr {{0.530}}\cell
+\cellx7110
+\qr {{0.578}}\cell
+\cellx7828
+\qr {{0.021}}\cell
+\cellx8546
+\qr {{0.051}}\cell
+\cellx9264
+\qr {{0.065}}\cell
+\cellx9982
+\qr {{0.841}}\cell
+\cellx10700
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx10700{}\cell
+\row}
+
+
+{
+{\b\qc\line Firm-year level }{\par}
+\trowd\trgaph108\trleft-108\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx1200\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx2100\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx3000\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx3900
+\ql {}\cell
+\qr {Freq.}\cell
+\qr {Percent}\cell
+\qr {Cum.}\cell
+\row
+\trowd\trgaph108\trleft-108\cellx1200\cellx2100\cellx3000\cellx3900
+\ql {0}\cell
+\qr {2736429}\cell
+\qr {99.88}\cell
+\qr {99.88}\cell
+\row
+\ql {1}\cell
+\qr {3152}\cell
+\qr {0.12}\cell
+\qr {100.00}\cell
+\row
+\trowd\trgaph108\trleft-108\clbrdrt\brdrw10\brdrs\cellx1200\clbrdrt\brdrw10\brdrs\cellx2100\clbrdrt\brdrw10\brdrs\cellx3000\clbrdrt\brdrw10\brdrs\cellx3900 
+\ql {Total}\cell
+\qr {2739581}\cell
+\qr {100.00}\cell
+\qr {}\cell
+\row
+}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx3900\cell
+\row}
+
+
+{
+{\b\qc\line Firm level }{\par}
+\trowd\trgaph108\trleft-108\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx1200\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx2100\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx3000\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs\cellx3900
+\ql {}\cell
+\qr {Freq.}\cell
+\qr {Percent}\cell
+\qr {Cum.}\cell
+\row
+\trowd\trgaph108\trleft-108\cellx1200\cellx2100\cellx3000\cellx3900
+\ql {0}\cell
+\qr {343510}\cell
+\qr {99.91}\cell
+\qr {99.91}\cell
+\row
+\ql {1}\cell
+\qr {293}\cell
+\qr {0.09}\cell
+\qr {100.00}\cell
+\row
+\trowd\trgaph108\trleft-108\clbrdrt\brdrw10\brdrs\cellx1200\clbrdrt\brdrw10\brdrs\cellx2100\clbrdrt\brdrw10\brdrs\cellx3000\clbrdrt\brdrw10\brdrs\cellx3900 
+\ql {Total}\cell
+\qr {343803}\cell
+\qr {100.00}\cell
+\qr {}\cell
+\row
+}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx3900\cell
+\row}
+
+
+{\b\qc\line Pre-treatment means of f_cite_science_num_w }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx3720
+\fs20 \pard\intbl \qr { group}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx5020
+\fs20 \pard\intbl \qr { mean_f_cite_science_num_w}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3720
+\fs20 \pard\intbl \ql { pre-treatment mean (all sample)}\cell
+\cellx5020
+\fs20 \pard\intbl \qr {    0.797}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx3720
+\fs20 \pard\intbl \ql { pre-treatment mean (after CEM)}\cell
+\cellx5020
+\fs20 \pard\intbl \qr {    0.466}\cell
+\row}
+
+
+\writepositionforappend
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx5020 \cell
+\row}}}

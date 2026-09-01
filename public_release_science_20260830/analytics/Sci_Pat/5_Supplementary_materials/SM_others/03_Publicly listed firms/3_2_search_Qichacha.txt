@@ -1,0 +1,19 @@
+Chinese listed companies and their subsidiaries were batch-searched in Qichacha to obtain basic company information, mainly English names.
+
+The names of the Chinese listed companies and their subsidiaries came from CSMAR.
+
+To improve the accuracy of batch searches in Qichacha, these names were split into 152 smaller files, each containing fewer than 20,000 Chinese characters, for searching. This was because Qichacha requires uploaded company names to be within 20,000 Chinese characters, and directly uploading a file with 5,000 entries was less effective than this method.
+
+The searches were conducted by date as follows:
+
+December 7, 2025: Files 1–30
+December 8, 2025: Files 31–60
+December 9, 2025: Files 61–100
+December 10, 2025: Files 101–140
+December 11, 2025: Files 141–152
+
+Meaning of each data folder:
+
+(1) to_search: Company names to be searched in Qichacha
+(2) Qichacha_name_link: Matches between CSMAR company names and Qichacha company names obtained from Qichacha batch searches
+(3) Qichacha_firm_info: Information on the matched companies from Qichacha

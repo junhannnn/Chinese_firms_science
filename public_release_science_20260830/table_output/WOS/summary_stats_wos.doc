@@ -1,0 +1,176 @@
+{\rtf1\ansi\deff0 {\fonttbl{\f0\fnil Garamond;}}
+{\info {\author .}{\company .}{\title .}}
+\deflang1033\plain\fs20
+{\footer\pard\qc\plain\f0\fs20\chpgn\par}
+{
+{\fs20\b\qc\line Summary statistics }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx1650
+\fs20\pard\intbl\qr { }\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx2870
+\fs20\pard\intbl\qr {{ N}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx4090
+\fs20\pard\intbl\qr {{ Mean}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx5310
+\fs20\pard\intbl\qr {{ SD}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx6530
+\fs20\pard\intbl\qr {{ Median}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx7750
+\fs20\pard\intbl\qr {{ Min}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx8970
+\fs20\pard\intbl\qr {{ Max}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx1650
+\fs20\pard\intbl\ql {{ pub num}}\cell
+\cellx2870
+\qr {{1153256}}\cell
+\cellx4090
+\qr {{.436}}\cell
+\cellx5310
+\qr {{10.221}}\cell
+\cellx6530
+\qr {{0}}\cell
+\cellx7750
+\qr {{0}}\cell
+\cellx8970
+\qr {{3152}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx1650
+\fs20\pard\intbl\ql {{ f u colla num}}\cell
+\cellx2870
+\qr {{1153256}}\cell
+\cellx4090
+\qr {{.332}}\cell
+\cellx5310
+\qr {{7.374}}\cell
+\cellx6530
+\qr {{0}}\cell
+\cellx7750
+\qr {{0}}\cell
+\cellx8970
+\qr {{2391}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx1650
+\fs20\pard\intbl\ql {{ pub num h}}\cell
+\cellx2870
+\qr {{1153256}}\cell
+\cellx4090
+\qr {{.054}}\cell
+\cellx5310
+\qr {{1.398}}\cell
+\cellx6530
+\qr {{0}}\cell
+\cellx7750
+\qr {{0}}\cell
+\cellx8970
+\qr {{644}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx1650
+\fs20\pard\intbl\ql {{ f u colla num h}}\cell
+\cellx2870
+\qr {{1153256}}\cell
+\cellx4090
+\qr {{.046}}\cell
+\cellx5310
+\qr {{1.148}}\cell
+\cellx6530
+\qr {{0}}\cell
+\cellx7750
+\qr {{0}}\cell
+\cellx8970
+\qr {{535}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\clbrdrb\brdrw15\brdrs\cellx1650
+\fs20\pard\intbl\ql {{ did}}\cell
+\clbrdrb\brdrw15\brdrs\cellx2870
+\qr {{1153256}}\cell
+\clbrdrb\brdrw15\brdrs\cellx4090
+\qr {{.002}}\cell
+\clbrdrb\brdrw15\brdrs\cellx5310
+\qr {{0.043}}\cell
+\clbrdrb\brdrw15\brdrs\cellx6530
+\qr {{0}}\cell
+\clbrdrb\brdrw15\brdrs\cellx7750
+\qr {{0}}\cell
+\clbrdrb\brdrw15\brdrs\cellx8970
+\qr {{1}}\cell
+\row}
+
+
+{\fs20\b\qc\line Matrix of correlations }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx2090
+\fs20\pard\intbl\ql { {Variables}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx3310
+\fs20\pard\intbl\qr { {(1)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx4530
+\fs20\pard\intbl\qr { {(2)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx5750
+\fs20\pard\intbl\qr { {(3)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx6970
+\fs20\pard\intbl\qr { {(4)}}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs  \cellx8190
+\fs20\pard\intbl\qr { {(5)}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2090
+\fs20\pard\intbl\ql { {(1) pub_num}}\cell
+\cellx3310
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2090
+\fs20\pard\intbl\ql { {(2) f_u_colla_num}}\cell
+\cellx3310
+\qr {{0.982}}\cell
+\cellx4530
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2090
+\fs20\pard\intbl\ql { {(3) pub_num_h}}\cell
+\cellx3310
+\qr {{0.782}}\cell
+\cellx4530
+\qr {{0.829}}\cell
+\cellx5750
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2090
+\fs20\pard\intbl\ql { {(4) f_u_colla_num_h}}\cell
+\cellx3310
+\qr {{0.792}}\cell
+\cellx4530
+\qr {{0.846}}\cell
+\cellx5750
+\qr {{0.992}}\cell
+\cellx6970
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2090
+\fs20\pard\intbl\ql { {(5) did}}\cell
+\cellx3310
+\qr {{0.022}}\cell
+\cellx4530
+\qr {{0.020}}\cell
+\cellx5750
+\qr {{0.023}}\cell
+\cellx6970
+\qr {{0.022}}\cell
+\cellx8190
+\qr {{1.000}}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx8190{}\cell
+\row}
+
+
+\writepositionforappend
+}}
