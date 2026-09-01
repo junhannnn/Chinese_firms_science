@@ -1,139 +1,42 @@
 # Geopolitical tensions with the U.S. accelerate Chinese firms’ leveraging of science
 
-Public code-and-output release for the Science submission:
+Code and selected analysis outputs for the Science paper.
 
-**Geopolitical tensions with the U.S. accelerate Chinese firms’ leveraging of science**
+## Contents
 
-## What is included
+- `analytics/`: primarily Stata analysis code, plus supplementary notebooks.
+- `modules/`: Python preprocessing and matching code, plus two CNKI Stata files.
+- `stata_output/`: 24 analysis-ready data artifacts (15 `.dta` files and nine
+  archives), totaling about 0.57 GB as stored.
+- `figure_output/` and `table_output/`: selected final results.
+- `docs/`: data inventories, scope, requirements, and release limitations.
 
-- `modules/`: preprocessing code for CN patent-paper matching, CNKI, WOS,
-  shared helpers, and the OpenAlex institution step used by CN_CN preprocessing.
-  This folder is mostly Python notebooks/scripts, but it also includes two CNKI
-  Stata preprocessing scripts: `modules/CNKI/04_paperlevel_to_firmlevel.do` and
-  `modules/CNKI/08_data_cleaning.do`.
-- `analytics/`: Stata analysis code for background figures, the main
-  science-patent analyses, CNKI, and WOS.
-- [analytics/Main text figures_final version/](<analytics/Main text figures_final version/>): self-contained editing-team replotting
-  packages for Figures 1A and 1B. Each package includes a 28-row plotting table
-  in Stata and Excel formats, a portable Stata 18 do-file, editable `.gph`
-  output, a PDF, and figure-specific documentation.
-- `stata_output/`: selected analysis-ready Stata panels and event tables for the
-  public analysis boundary; several large panels are bundled as `.dta.zip`.
-- `proc_output/`: retained as the documented location for regenerated Python
-  process outputs; this lean public copy does not currently include proc-output
-  data files.
-- `figure_output/`: compact final figure outputs copied from the working
-  project.
-- `table_output/`: selected compact final table outputs copied from the working
-  project.
-- `config/dataset.yml`: relative path template for local reproduction.
-- `requirements.txt`: pinned Python packages for the released public package
-  set.
-- `scripts/setup_stata_packages.do`: central installer for user-written Stata
-  packages used by the release.
-- `scripts/sanitize_public_release.py`: structural public-release checker and
-  processed-data manifest refresher.
-- `docs/`: raw-data inventory, processed-data manifest, processed-data scope
-  notes, excluded data policy, software notes, and readiness review.
+Raw data, most upstream intermediates, and Python process outputs are not
+included. See `docs/processed_data_manifest.csv` for the included files and
+`docs/raw_data_inventory.md` for excluded inputs.
 
-## Main-text figure replotting
+## Quick start
 
-The Figure 1 packages under [analytics/Main text figures_final version/](<analytics/Main text figures_final version/>) use only processed
-event-study coefficients and 95% confidence intervals; they do not require the
-firm-level estimation samples. Figure 1A contains all four series from
-`stata_output/CN_CN/ROS_event_table.dta`. Figure 1B contains the matched-sample
-groups B and D from `stata_output/CNKI/CNKI_event_table.dta` and
-`stata_output/WOS/WOS_event_table.dta`.
+1. Install the Python packages listed in `requirements.txt`.
+2. In Stata, run `do scripts/setup_stata_packages.do` once to install the
+   required user-written commands.
+3. Extract the Stata archives before use: extract the six `.dta.zip` files from
+   the release root while preserving their stored paths; extract each of the
+   three other `_cem.zip` files into its containing directory.
+4. Use the analysis-ready files with the relevant code under `analytics/`.
 
-To reproduce a figure, open Stata 18 or later, change the working directory to
-the corresponding `Figure1A` or `Figure1B` package folder, and run `do`
-[Figure1A.do](<analytics/Main text figures_final version/Figure1A/Figure1A.do>) or `do`
-[Figure1B.do](<analytics/Main text figures_final version/Figure1B/Figure1B.do>). The do-file overwrites the local `.gph`
-and PDF outputs. Figure 1B stores the final `x_plot` offsets in both plotting-data
-formats so the left-to-right positions follow its interleaved CNKI/WOS legend;
-the do-file validates and uses those stored coordinates without recalculation.
-See [README_Figure1B.txt](<analytics/Main text figures_final version/Figure1B/README_Figure1B.txt>)
-for the series-specific offsets.
-
-## What is not included
-
-Raw data and large nonessential upstream intermediates are not included because
-many are large and/or third-party data products. See:
-
-- `docs/raw_data_inventory.md`
-- `docs/processed_data_scope.md`
-- `docs/excluded_data_policy.md`
-
-The included process-data layer is listed in
-`docs/processed_data_manifest.csv`. In the current public copy, that manifest
-covers the 24 included `stata_output/` files (about 1.11 GB in decimal units),
-including compressed `.dta.zip` replacements and CEM-matched listed-firm panels
-for the CN patent-science, CNKI, and WOS analyses. Full reconstruction from raw
-data, or rerunning upstream
-WOS/CNKI/CN_CN preprocessing, still requires the raw and intermediate inputs
-described in `docs/raw_data_inventory.md` and
-`docs/submission_readiness_review_20260626.md`.
-
-## Public-use notes
-
-The selected `stata_output/` files are present in this folder. Unzip the bundled
-`.dta.zip` files before using those panels directly in Stata. If this release is
-shared through a Git repository, confirm whether the hosting workflow should
-track the bundled process-data files directly or publish them as a separate
-release asset.
-
-**Please find all `.zip` files and unzip them with: `find . -name "*.zip" -type f -exec unzip -o {} \;`**
-
-Optional upstream, archival, and LLM-assisted reconstruction scripts use
-release-relative paths or documented environment-variable defaults instead of
-private local paths/endpoints. They still require excluded raw/source data
-before full raw-data reconstruction can be attempted.
-
-Before publishing or after changing files, recheck notebook output hygiene,
-credential/cache artifacts, private local paths, and the consistency of
-`docs/processed_data_manifest.csv` against the included `proc_output/` and
-`stata_output/` files. If process-data files are intentionally added or removed,
-update the manifest paths, byte counts, and purpose notes accordingly. Run
-`python scripts/sanitize_public_release.py --check` for the structural preflight,
-or add `--refresh-processed-manifest` to rebuild the processed-data manifest
-from the live `proc_output/` and `stata_output/` files.
-
-## Reproduction outline
-
-1. Install Python dependencies from `requirements.txt`; see
-   `docs/software_requirements.md` for the one archival/manual Python module
-   caveat.
-2. In Stata, run `do scripts/setup_stata_packages.do` once in an internet-enabled
-   session to install the required SSC user-written commands.
-3. To reproduce from the included analysis-ready data, start with the public
-   boundary described in `docs/submission_readiness_review_20260626.md`. Do not
-   treat every `00_run_all*.do` file as runnable from the bundled data.
-4. To rebuild the analysis-ready data from raw sources, place raw data under the
-   `dataset/` subfolders documented in `docs/raw_data_inventory.md`, check or
-   edit `config/dataset.yml`, and run the relevant Python notebooks under
-   `modules/` plus the upstream Stata preprocessing code.
-
-The primary active WOS preprocessing code is in `modules/WOS`; the older private
-WOS preprocessing version is not included.
-
-## Credential and endpoint note
-
-No API keys are included. OpenAI-assisted steps use the `OPENAI_API_KEY`
-environment variable or a local, unpublished `config/openai_api_key.txt` file.
-Ollama-assisted steps default to `http://localhost:11434`; set `OLLAMA_HOST`,
-`OLLAMA_HOSTS`, or `OLLAMA_BASE_URL` if your local LLM server uses another URL.
-Do not publish a filled key file.
+Not every upstream or archival runner can execute from the bundled data alone.
+See `docs/submission_readiness_review_20260626.md` for the supported boundary.
+Full reconstruction requires the external inputs in
+`docs/raw_data_inventory.md` and paths configured in `config/dataset.yml`.
+Optional LLM-assisted steps require user-provided credentials or local services;
+no API keys are included.
 
 ## Verification
 
-This folder was created by copying into a new public-release directory and then
-sanitizing only the copied files. The original project files were not edited.
-
-The current structural checks support publishing this folder as a code-plus-
-selected-analysis-output public release, with limitations documented in
-`docs/submission_readiness_review_20260626.md`.
+Run `python scripts/sanitize_public_release.py --check` from the release root.
+This structural check does not rerun the analyses or reconstruct raw data.
 
 ## Contact
 
-If you have any questions or suggestions about the code or data, please contact
-junhan.wang@szu.edu.cn.
+Questions or suggestions: [junhan.wang@szu.edu.cn](mailto:junhan.wang@szu.edu.cn).

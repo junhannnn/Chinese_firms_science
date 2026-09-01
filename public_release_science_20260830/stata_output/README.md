@@ -6,7 +6,10 @@ important data; unimportant data are omitted because including everything would
 result in a very large file. If you need the specific files, you can contact
 the first author to request them.
 
-**Please find all `.zip` files and unzip them with: `find . -name "*.zip" -type f -exec unzip -o {} \;`**
+The archives use two internal path layouts, so they must be extracted according
+to their filename type. Follow the **Extracting the bundled Stata data** section
+in `../README.md`; a single generic unzip command will not place every `.dta`
+file in the directory expected by the analysis code.
 
 Included subfolders:
 
