@@ -1,0 +1,222 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\CNKI_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 10:20:23
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI\01_CNKI_DID.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: CNKI analysis
+> Script:  01_CNKI_DID.do
+> 
+> Purpose:
+>   Produce descriptive statistics and baseline difference-in-differences (DID)
+>   estimates for publication outcomes in the full Chinese-firm sample. The
+>   models report level, log-transformed, and Poisson specifications.
+> 
+> Main input:
+>   ${c -(}stata_output{c )-}CNKI_DID.dta
+> 
+> Main outputs:
+>   - ${c -(}table_output{c )-}CNKI_summary_stats.doc (descriptive and correlation tables)
+>   - ${c -(}table_output{c )-}CNKI_main.rtf (baseline DID estimates)
+> 
+> Required setup:
+>   00_run_all.do defines stata_output and table_output before calling this file.
+>   The script also requires the community-contributed commands asdoc, reghdfe,
+>   ppmlhdfe, and esttab.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Produce descriptive statistics
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CNKI_DID.dta, clear
+{txt}
+{com}. 
+. * Define publication outcomes and the DID indicator included in summary tables.
+. global summary_statistics ///
+> pub_num f_u_colla_num pub_num_h f_u_colla_num_h /// Dependent variables
+> did // DID indicator
+{txt}
+{com}. 
+. * Append the three descriptive panels to a single Word-compatible document.
+. * Panel 1: distributional summary statistics.
+. asdoc tabstat $summary_statistics, save(${c -(}table_output{c )-}CNKI_summary_stats.doc) replace stat(N mean sd p50 min max)
+{res}
+{txt}{space 0}{space 0}{ralign 12:}{space 1}{c |}{space 1}{ralign 9:N}{space 1}{space 1}{ralign 9:Mean}{space 1}{space 1}{ralign 9:SD}{space 1}{space 1}{ralign 9:p50}{space 1}{space 1}{ralign 9:Min}{space 1}{space 1}{ralign 9:Max}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 10}
+{space 0}{space 0}{ralign 12:pub_num}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2176447}}}{space 1}{space 1}{ralign 9:{res:{sf: .3123784}}}{space 1}{space 1}{ralign 9:{res:{sf: 2.272286}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      439}}}{space 1}
+{space 0}{space 0}{ralign 12:f_u_colla_~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2176447}}}{space 1}{space 1}{ralign 9:{res:{sf: .2063602}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.378745}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      324}}}{space 1}
+{space 0}{space 0}{ralign 12:pub_num_h}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2176447}}}{space 1}{space 1}{ralign 9:{res:{sf: .1560677}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.515139}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      369}}}{space 1}
+{space 0}{space 0}{ralign 12:f_u_colla~_h}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2176447}}}{space 1}{space 1}{ralign 9:{res:{sf: .1113223}}}{space 1}{space 1}{ralign 9:{res:{sf: .9628283}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      277}}}{space 1}
+{space 0}{space 0}{ralign 12:did}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2176447}}}{space 1}{space 1}{ralign 9:{res:{sf: .0021324}}}{space 1}{space 1}{ralign 9:{res:{sf: .0461284}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        1}}}{space 1}
+{res}{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI/../../table_output/CNKI/CNKI_summary_stats.doc{rm}
+not found)
+{p_end}
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI/../../table_output/CNKI/CNKI_summary_stats.doc"}
+
+{com}. 
+. * Panel 2: pairwise correlation matrix.
+. asdoc cor $summary_statistics, save(${c -(}table_output{c )-}CNKI_summary_stats.doc) append
+{txt}(obs=2,176,447)
+
+             {c |}  pub_num f_u_co~m pub_n~_h f_u_c~_h      did
+{hline 13}{c +}{hline 45}
+     pub_num {c |}{res}   1.0000
+{txt}f_u_colla_~m {c |}{res}   0.9184   1.0000
+   {txt}pub_num_h {c |}{res}   0.8924   0.8449   1.0000
+{txt}f_u_colla~_h {c |}{res}   0.8381   0.9155   0.9188   1.0000
+         {txt}did {c |}{res}   0.0118   0.0118   0.0030   0.0035   1.0000
+
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI/../../table_output/CNKI/CNKI_summary_stats.doc"}
+{txt}
+{com}. 
+. * Panel 3: pre-treatment publication outcomes for treated firms.
+. use ${c -(}stata_output{c )-}CNKI_DID.dta, clear
+{txt}
+{com}. keep if entity_list == 1 & year < list_year
+{txt}(2,160,249 observations deleted)
+
+{com}. 
+. asdoc sum pub_num_w f_u_colla_num_w, ///
+>     save(${c -(}table_output{c )-}CNKI_summary_stats.doc) append ///
+>     stat(mean)
+{res}
+{txt}{space 0}{space 0}{ralign 12:}{space 1}{c |}{space 1}{ralign 9:Mean}{space 1}
+{space 0}{hline 13}{c   +}{hline 10}
+{space 0}{space 0}{ralign 12:pub_num_w}{space 1}{c |}{space 1}{ralign 9:{res:{sf: .4325843}}}{space 1}
+{space 0}{space 0}{ralign 12:f_u_coll~m_w}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  .272441}}}{space 1}
+{res}Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI/../../table_output/CNKI/CNKI_summary_stats.doc"}
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Estimate baseline DID models for publication counts
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CNKI_DID.dta, clear
+{txt}
+{com}. 
+. * Model 1: linear specification for winsorized publication counts.
+. reghdfe pub_num_w did, absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,176,447
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}2009015{txt}){col 67}= {res}     23.40
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5593
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.5226
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.9396
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .1443898{col 26}{space 2} .0298458{col 37}{space 1}    4.84{col 46}{space 3}0.000{col 54}{space 4}  .085893{col 67}{space 3} .2028866
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .287632{col 26}{space 2} .0006384{col 37}{space 1}  450.52{col 46}{space 3}0.000{col 54}{space 4} .2863807{col 67}{space 3} .2888834
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   167419{col 27}{space 1}        0{col 39}{result}{space 1}   167419{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: linear specification for log-transformed publication counts.
+. reghdfe ln_pub_num did, absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,176,447
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}2009015{txt}){col 67}= {res}     10.88
+{txt}{col 51}Prob > F{col 67}= {res}    0.0010
+{txt}{col 51}R-squared{col 67}= {res}    0.3710
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3186
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.3099
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}  ln_pub_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0222473{col 26}{space 2} .0067439{col 37}{space 1}    3.30{col 46}{space 3}0.001{col 54}{space 4} .0090294{col 67}{space 3} .0354652
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1330613{col 26}{space 2} .0002105{col 37}{space 1}  632.19{col 46}{space 3}0.000{col 54}{space 4} .1326487{col 67}{space 3} .1334738
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   167419{col 27}{space 1}        0{col 39}{result}{space 1}   167419{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: Poisson specification for publication counts.
+. ppmlhdfe pub_num did, absorb(firm_id year) vce(r)
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}1.8823e+06 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.16  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}1.5862e+06 {col 39}{txt}eps = {res}1.87e-01 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.62  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}1.5588e+06 {col 39}{txt}eps = {res}1.76e-02 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.81  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}1.5578e+06 {col 39}{txt}eps = {res}6.42e-04 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.83  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}1.5578e+06 {col 39}{txt}eps = {res}8.59e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.83  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}1.5578e+06 {col 39}{txt}eps = {res}2.01e-08 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -3.83  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}1.5578e+06 {col 39}{txt}eps = {res}5.83e-13 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -3.83  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 7 iterations and 16 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}   2176447
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}   2009015
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      8.08
+{txt}Deviance{col 22}={col 24}{res} 1557802.775{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0045
+{txt}Log pseudolikelihood ={col 24}{res}-1139795.932{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.4769
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     pub_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .1469608{col 26}{space 2} .0517106{col 37}{space 1}    2.84{col 46}{space 3}0.004{col 54}{space 4} .0456099{col 67}{space 3} .2483116
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .3638113{col 26}{space 2} .0028815{col 37}{space 1}  126.26{col 46}{space 3}0.000{col 54}{space 4} .3581636{col 67}{space 3}  .369459
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   167419{col 27}{space 1}        0{col 39}{result}{space 1}   167419{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Export the three stored specifications as one regression table.
+. esttab M1 M2 M3 using ${c -(}table_output{c )-}CNKI_main.rtf, ///
+>     replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>     b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>     stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>     mtitles("Model 1" "Model 2" "Model 3") ///
+>     nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\CNKI/../../table_output/CNKI/CNKI_main.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\CNKI_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 10:22:00
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

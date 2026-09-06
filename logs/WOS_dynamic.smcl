@@ -1,0 +1,558 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_dynamic.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 10:44:20
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS\04_WOS_dynamic_effect.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: WOS analysis
+> Script:  04_WOS_dynamic_effect.do
+> 
+> Purpose:
+>   Estimate dynamic treatment effects for Web of Science (WOS) publication
+>   outcomes among Chinese firms and Chinese listed firms using full and
+>   coarsened-exact-matching (CEM) samples. The script creates four event-study
+>   panels, extracts their coefficients and confidence intervals, and produces a
+>   combined two-axis figure.
+> 
+> Main inputs:
+>   - ${c -(}stata_output{c )-}CN_WOS_DID.dta
+>   - ${c -(}stata_output{c )-}CN_WOS_DID_cem.dta
+>   - ${c -(}stata_output{c )-}CN_WOS_DID_listed.dta
+>   - ${c -(}stata_output{c )-}CN_WOS_DID_listed_cem.dta
+> 
+> Main outputs:
+>   - ${c -(}stata_output{c )-}WOS_event_table.dta (event-time estimates by sample)
+>   - ${c -(}figure_output{c )-}WOS_dynamic.gph (combined event-study figure)
+> 
+> Intermediate outputs:
+>   ${c -(}figure_output{c )-}dynamic1.gph through dynamic4.gph are created for the initial
+>   four-panel graph and deleted after that graph is combined.
+> 
+> Required setup:
+>   00_run_all.do defines stata_output and figure_output before calling this file.
+>   The script requires the community-contributed eventdd command and its hdfe
+>   estimation dependencies.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate dynamic effects for all Chinese firms: full sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID.dta, clear
+{txt}
+{com}. 
+. * Restrict nonmissing event times to the three years before and after treatment.
+. gen dif_year = year-list_year
+{txt}(1,143,428 missing values generated)
+
+{com}. drop if dif_year!=. & !inrange(dif_year, -3, 3)
+{txt}(5,471 observations deleted)
+
+{com}. 
+. eventdd pub_num_w, timevar(dif_year) ///
+>     method(hdfe, absorb(firm_id year)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("# of publications indexed by WOS") ///
+>              xtitle("Sanction Year") ///
+>              title("(A) Chinese firms (full sample)", size(medium)) ///
+>              xscale(range(-3 3)) ///
+>              legend(off) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>              scheme(journal))
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 4 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,147,785
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   6{txt},{res}1059055{txt}){col 67}= {res}      8.59
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4938
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4514
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    0.7087
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 7}lead3 {c |}{col 14}{res}{space 2}-.1001982{col 26}{space 2} .0453337{col 37}{space 1}   -2.21{col 46}{space 3}0.027{col 54}{space 4}-.1890507{col 67}{space 3}-.0113457
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.0032158{col 26}{space 2} .0405501{col 37}{space 1}   -0.08{col 46}{space 3}0.937{col 54}{space 4}-.0826926{col 67}{space 3}  .076261
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0656192{col 26}{space 2} .0375681{col 37}{space 1}    1.75{col 46}{space 3}0.081{col 54}{space 4} -.008013{col 67}{space 3} .1392514
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .1555993{col 26}{space 2} .0442713{col 37}{space 1}    3.51{col 46}{space 3}0.000{col 54}{space 4} .0688291{col 67}{space 3} .2423694
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .2512207{col 26}{space 2}  .053718{col 37}{space 1}    4.68{col 46}{space 3}0.000{col 54}{space 4} .1459352{col 67}{space 3} .3565062
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .0332843{col 26}{space 2} .0913354{col 37}{space 1}    0.36{col 46}{space 3}0.716{col 54}{space 4}-.1457301{col 67}{space 3} .2122986
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .2606809{col 26}{space 2}  .000668{col 37}{space 1}  390.26{col 46}{space 3}0.000{col 54}{space 4} .2593717{col 67}{space 3} .2619901
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    88712{col 27}{space 1}        0{col 39}{result}{space 1}    88712{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. 
+. est store M1
+{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic1.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic1.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic1.gph} saved
+
+{com}. 
+. * ==============================================================================
+. * 2. Estimate dynamic effects for all Chinese firms: CEM sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID_cem.dta, clear
+{txt}
+{com}. 
+. keep if cem_matched==1
+{txt}(129,246 observations deleted)
+
+{com}. gen dif_year = year-list_year
+{txt}(1,016,704 missing values generated)
+
+{com}. drop if dif_year!=. & !inrange(dif_year, -3, 3)
+{txt}(4,070 observations deleted)
+
+{com}. 
+. eventdd pub_num_w [aweight=cem_weights], timevar(dif_year) ///
+>     method(hdfe, absorb(firm_id year)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("# of publications indexed by WOS") ///
+>              xtitle("Sanction Year") ///
+>              title("(B) Chinese firms (matched sample)", size(medium)) ///
+>              xscale(range(-3 3)) ///
+>              legend(off) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>              scheme(journal))
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 4 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,019,940
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   6{txt},{res} 941152{txt}){col 67}= {res}     10.78
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5412
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.5028
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    0.8673
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 7}lead3 {c |}{col 14}{res}{space 2}-.1533382{col 26}{space 2} .0596632{col 37}{space 1}   -2.57{col 46}{space 3}0.010{col 54}{space 4}-.2702761{col 67}{space 3}-.0364003
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.0364408{col 26}{space 2} .0533462{col 37}{space 1}   -0.68{col 46}{space 3}0.495{col 54}{space 4}-.1409977{col 67}{space 3}  .068116
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0245771{col 26}{space 2} .0492819{col 37}{space 1}    0.50{col 46}{space 3}0.618{col 54}{space 4}-.0720137{col 67}{space 3}  .121168
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .2370853{col 26}{space 2} .0592106{col 37}{space 1}    4.00{col 46}{space 3}0.000{col 54}{space 4} .1210345{col 67}{space 3} .3531361
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .3331214{col 26}{space 2} .0689064{col 37}{space 1}    4.83{col 46}{space 3}0.000{col 54}{space 4} .1980672{col 67}{space 3} .4681755
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2}-.0261461{col 26}{space 2}   .09449{col 37}{space 1}   -0.28{col 46}{space 3}0.782{col 54}{space 4}-.2113434{col 67}{space 3} .1590512
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .359848{col 26}{space 2}  .001458{col 37}{space 1}  246.81{col 46}{space 3}0.000{col 54}{space 4} .3569903{col 67}{space 3} .3627056
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    78770{col 27}{space 1}        0{col 39}{result}{space 1}    78770{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. 
+. est store M2
+{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic2.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic2.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic2.gph} saved
+
+{com}. 
+. * ==============================================================================
+. * 3. Estimate dynamic effects for Chinese listed firms: full sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID_listed.dta, clear
+{txt}
+{com}. 
+. gen dif_year = year-list_year
+{txt}(13,639 missing values generated)
+
+{com}. drop if dif_year!=. & !inrange(dif_year, -3, 3)
+{txt}(102 observations deleted)
+
+{com}. 
+. eventdd pub_num_w, timevar(dif_year) ///
+>     method(hdfe, absorb(firm_id year)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("# of publications indexed by WOS") ///
+>              xtitle("Sanction Year") ///
+>              title("(C) Chinese listed firms (full sample)", size(medium)) ///
+>              xscale(range(-3 3)) ///
+>              legend(off) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>              scheme(journal))
+{res}{txt}(dropped 42 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 4 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    13,678
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   6{txt},{res}  12600{txt}){col 67}= {res}      1.51
+{txt}{col 51}Prob > F{col 67}= {res}    0.1699
+{txt}{col 51}R-squared{col 67}= {res}    0.6910
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6646
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0011
+{txt}{col 51}Root MSE{col 67}= {res}    1.2426
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 7}lead3 {c |}{col 14}{res}{space 2}-1.486715{col 26}{space 2} .6725042{col 37}{space 1}   -2.21{col 46}{space 3}0.027{col 54}{space 4}-2.804925{col 67}{space 3}-.1685041
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.4391828{col 26}{space 2} .3740707{col 37}{space 1}   -1.17{col 46}{space 3}0.240{col 54}{space 4}-1.172418{col 67}{space 3} .2940527
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0597581{col 26}{space 2} .2960224{col 37}{space 1}    0.20{col 46}{space 3}0.840{col 54}{space 4} -.520491{col 67}{space 3} .6400071
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2}-.4927291{col 26}{space 2} .4994983{col 37}{space 1}   -0.99{col 46}{space 3}0.324{col 54}{space 4}-1.471822{col 67}{space 3} .4863635
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2}-.5826459{col 26}{space 2} .3604787{col 37}{space 1}   -1.62{col 46}{space 3}0.106{col 54}{space 4}-1.289239{col 67}{space 3} .1239472
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .2688668{col 26}{space 2} 1.115233{col 37}{space 1}    0.24{col 46}{space 3}0.809{col 54}{space 4} -1.91716{col 67}{space 3} 2.454893
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .953682{col 26}{space 2} .0106527{col 37}{space 1}   89.52{col 46}{space 3}0.000{col 54}{space 4} .9328011{col 67}{space 3} .9745629
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text} firm_id_wos{col 14}{c |}{space 1}     1060{col 27}{space 1}        0{col 39}{result}{space 1}     1060{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. 
+. est store M3
+{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic3.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic3.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic3.gph} saved
+
+{com}. 
+. * ==============================================================================
+. * 4. Estimate dynamic effects for Chinese listed firms: CEM sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID_listed_cem.dta, clear
+{txt}
+{com}. 
+. keep if cem_matched==1
+{txt}(2,288 observations deleted)
+
+{com}. gen dif_year = year-list_year
+{txt}(11,352 missing values generated)
+
+{com}. drop if dif_year!=. & !inrange(dif_year, -3, 3)
+{txt}(102 observations deleted)
+
+{com}. 
+. eventdd pub_num_w [aweight=cem_weights], timevar(dif_year) ///
+>     method(hdfe, absorb(firm_id year)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("# of publications indexed by WOS") ///
+>              xtitle("Sanction Year") ///
+>              title("(D) Chinese listed firms (matched sample)", size(medium)) ///
+>              xscale(range(-3 3)) ///
+>              legend(off) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>              scheme(journal))
+{res}{txt}(dropped 43 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    11,389
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   6{txt},{res}  10363{txt}){col 67}= {res}      1.62
+{txt}{col 51}Prob > F{col 67}= {res}    0.1358
+{txt}{col 51}R-squared{col 67}= {res}    0.6714
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6389
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0018
+{txt}{col 51}Root MSE{col 67}= {res}    1.2002
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 7}lead3 {c |}{col 14}{res}{space 2}  -1.7452{col 26}{space 2} .7112464{col 37}{space 1}   -2.45{col 46}{space 3}0.014{col 54}{space 4} -3.13938{col 67}{space 3}-.3510199
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.5011468{col 26}{space 2} .3823374{col 37}{space 1}   -1.31{col 46}{space 3}0.190{col 54}{space 4}-1.250602{col 67}{space 3} .2483083
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0497382{col 26}{space 2} .2967222{col 37}{space 1}    0.17{col 46}{space 3}0.867{col 54}{space 4}-.5318947{col 67}{space 3}  .631371
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2}-.4629839{col 26}{space 2} .5040777{col 37}{space 1}   -0.92{col 46}{space 3}0.358{col 54}{space 4}-1.451074{col 67}{space 3} .5251057
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2}-.5329943{col 26}{space 2} .3682249{col 37}{space 1}   -1.45{col 46}{space 3}0.148{col 54}{space 4}-1.254786{col 67}{space 3} .1887976
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .4704958{col 26}{space 2} 1.035834{col 37}{space 1}    0.45{col 46}{space 3}0.650{col 54}{space 4}-1.559939{col 67}{space 3}  2.50093
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .8742758{col 26}{space 2} .0132415{col 37}{space 1}   66.03{col 46}{space 3}0.000{col 54}{space 4} .8483198{col 67}{space 3} .9002317
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text} firm_id_wos{col 14}{c |}{space 1}     1008{col 27}{space 1}        0{col 39}{result}{space 1}     1008{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. 
+. est store M4
+{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic4.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic4.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/dynamic4.gph} saved
+
+{com}. 
+. * ==============================================================================
+. * 5. Combine the four initial panels and remove their temporary graph files
+. * ==============================================================================
+. 
+. graph combine ${c -(}figure_output{c )-}dynamic1.gph ${c -(}figure_output{c )-}dynamic2.gph ///
+> ${c -(}figure_output{c )-}dynamic3.gph ${c -(}figure_output{c )-}dynamic4.gph
+{res}{txt}
+{com}. 
+. erase ${c -(}figure_output{c )-}dynamic1.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic2.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic3.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic4.gph
+{txt}
+{com}. 
+. * ==============================================================================
+. * 6. Build a dataset of event-study estimates and confidence intervals
+. * ==============================================================================
+. 
+. * Map the four stored models to group identifiers used in the combined figure.
+. local models M1 M2 M3 M4
+{txt}
+{com}. local groups A B C D
+{txt}
+{com}. 
+. tempname posth
+{txt}
+{com}. tempfile  out
+{txt}
+{com}. postfile `posth' str1 group x y ci_low ci_high using `out', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_6d0_000001.tmp{rm}
+not found)
+{p_end}
+
+{com}. local z = invnormal(0.975)
+{txt}
+{com}. local k = 0
+{txt}
+{com}. foreach m of local models {c -(}
+{txt}  2{com}.     local ++k
+{txt}  3{com}.     local g : word `k' of `groups'
+{txt}  4{com}.     estimates restore `m'
+{txt}  5{com}. 
+.     * Inspect coefficient names to identify event-time leads and lags.
+.     local names : colnames e(b)
+{txt}  6{com}. 
+.     * Extract coefficients whose names match the lead or lag naming convention.
+.     foreach nm of local names {c -(}
+{txt}  7{com}.         * Normalize case before applying the regular-expression matches.
+.         local nm_low = lower("`nm'")
+{txt}  8{com}. 
+.         local matched = 0
+{txt}  9{com}.         local x = .
+{txt} 10{com}. 
+.         * Convert leadK coefficients to negative event times.
+.         quietly if regexm("`nm_low'","lead([0-9]+)") {c -(}
+{txt} 11{com}.             local K = real(regexs(1))
+{txt} 12{com}.             local x = -`K'
+{txt} 13{com}.             local matched = 1
+{txt} 14{com}.         {c )-}
+{txt} 15{com}. 
+.         * Convert lagK coefficients to positive event times.
+.         quietly if (`matched'==0) & regexm("`nm_low'","lag([0-9]+)") {c -(}
+{txt} 16{com}.             local K = real(regexs(1))
+{txt} 17{com}.             local x = `K'
+{txt} 18{com}.             local matched = 1
+{txt} 19{com}.         {c )-}
+{txt} 20{com}. 
+.         if (`matched') {c -(}
+{txt} 21{com}.             * Calculate the 95% confidence interval for the matched coefficient.
+.             capture scalar b  = _b[`nm']
+{txt} 22{com}.             capture scalar se = _se[`nm']
+{txt} 23{com}.             if (_rc==0) {c -(}
+{txt} 24{com}.                 scalar lo = b - `z'*se
+{txt} 25{com}.                 scalar hi = b + `z'*se
+{txt} 26{com}.                 post `posth' ("`g'") (`x') (b) (lo) (hi)
+{txt} 27{com}.             {c )-}
+{txt} 28{com}.         {c )-}
+{txt} 29{com}.     {c )-}
+{txt} 30{com}. 
+.     * Add the normalized treatment-year baseline at event time zero.
+.     post `posth' ("`g'") (0) (0) (0) (0)
+{txt} 31{com}. {c )-}
+{txt}(results {stata estimates replay M1:M1} are active now)
+(results {stata estimates replay M2:M2} are active now)
+(results {stata estimates replay M3:M3} are active now)
+(results {stata estimates replay M4:M4} are active now)
+
+{com}. postclose `posth'
+{txt}
+{com}. 
+. use `out', clear
+{txt}
+{com}. order group x y ci_low ci_high
+{txt}
+{com}. sort group x
+{txt}
+{com}. 
+. save ${c -(}stata_output{c )-}WOS_event_table.dta, replace
+{txt}{p 0 4 2}
+file {bf}
+W:\Mac_Sync\Downloads\ROS\stata_output\WOS\WOS_event_table.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. * ==============================================================================
+. * 7. Plot the four event-study series on two y-axes
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}WOS_event_table.dta, clear
+{txt}
+{com}. 
+. * Offset group coordinates horizontally so estimates at each event time remain visible.
+. gen double x_plot = x + ///
+>         cond(group=="A", -0.24, ///
+>         cond(group=="B", -0.08, ///
+>         cond(group=="C",  0.08, ///
+>                           0.24)))   // Group D
+{txt}
+{com}. 
+. * Assign a distinct color and marker to each sample definition.
+. local colA green*1
+{txt}
+{com}. local colB ebblue*1.5
+{txt}
+{com}. local colC purple*1.5
+{txt}
+{com}. local colD red*1.5
+{txt}
+{com}. 
+. local markA circle
+{txt}
+{com}. local markB square
+{txt}
+{com}. local markC triangle
+{txt}
+{com}. local markD diamond
+{txt}
+{com}. 
+. * Plot confidence intervals and point estimates for all four groups.
+. twoway                                                      ///
+>     /* Group A — left Y-axis */                             ///
+>     (rcap  ci_low ci_high x_plot if group=="A", lcolor(`colA') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="A", mcolor(`colA') msymbol(`markA') msize(medsmall) yaxis(1)) ///
+>     /* Group B — left Y-axis */                             ///
+>     (rcap  ci_low ci_high x_plot if group=="B", lcolor(`colB') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="B", mcolor(`colB') msymbol(`markB') msize(medsmall) yaxis(1)) ///
+>     /* Group C — right Y-axis */                            ///
+>     (rcap  ci_low ci_high x_plot if group=="C", lcolor(`colC') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="C", mcolor(`colC') msymbol(`markC') msize(medsmall) yaxis(2)) ///
+>     /* Group D — right Y-axis */                            ///
+>     (rcap  ci_low ci_high x_plot if group=="D", lcolor(`colD') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="D", mcolor(`colD') msymbol(`markD') msize(medsmall) yaxis(2)) ///
+>     ,                                                       ///
+>     /* Y-axis scales and labels */                          ///
+>     yscale(axis(1)) ylabel(-1(0.5)1, axis(1) labsize(medsmall)) ///
+>     yscale(axis(2)) ylabel(-10(5)10, axis(2) labsize(medsmall)) ///
+>     /* Axis titles and X-axis */                            ///
+>     ytitle("{c -(}bf: Chinese Firms'{c )-}""{c -(}bf: International Scientific Production{c )-}", size(medium) axis(1)) ///
+>     ytitle("{c -(}bf: Chinese Listed Firms'{c )-}""{c -(}bf: International Scientific Production{c )-}", size(medium) axis(2)) ///
+>     xtitle("{c -(}bf: Sanction Year{c )-}", size(medium)) xlabel(-3(1)3, labsize(medium))     ///
+>     /* Legend configuration */                              ///
+>     legend(order(2 "Chinese firms, full sample (left axis)" ///
+>                  4 "Chinese firms, matched sample (left axis)" ///
+>                  6 "Chinese listed firms, full sample (right axis)" ///
+>                  8 "Chinese listed firms, matched sample (right axis)") ///
+>            ring(0) pos(11) col(1) rowgap(*1.2) size(medsmall) region(margin(zero))) ///
+>     /* Reference lines */                                   ///
+>     yline(0, lpattern(dash) lcolor(gs11))                   ///
+>     xline(0, lpattern(dash) lcolor(gs11))                   ///
+>     /* Graph layout */                                      ///
+>     aspectratio(0.8) graphregion(margin(vsmall))
+{res}{txt}
+{com}. 
+. * ==============================================================================
+. * 8. Save the combined event-study figure
+. * ==============================================================================
+. 
+. graph save ${c -(}figure_output{c )-}WOS_dynamic.gph, replace
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../figure_output/WOS/WOS_dynamic.gph} saved
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_dynamic.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 10:45:09
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

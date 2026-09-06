@@ -1,0 +1,2 @@
+Paste your own OpenAI API key here only if you do not set OPENAI_API_KEY.
+Do not commit or publish a filled key file.

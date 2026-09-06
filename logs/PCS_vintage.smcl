@@ -1,0 +1,196 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_vintage.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 12:19:57
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\1_Chinese_firms\04_vintage.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—Chinese-firm analysis
+> Script:  04_vintage.do
+> 
+> Purpose:
+>   Estimate how treatment status relates to the publication vintage of science
+>   cited by Chinese-firm patents. Separate models use the minimum, maximum, mean,
+>   and median publication-year measures.
+> 
+> Main input:
+>   ${c -(}stata_output{c )-}DID_allfirm-level.dta
+> 
+> Main output:
+>   ${c -(}table_output{c )-}vintage.rtf
+> 
+> Required setup:
+>   The master runner defines stata_output and table_output before calling this
+>   file. The script also requires the community-contributed commands reghdfe and
+>   esttab.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate publication-vintage models
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Model 1: earliest publication year among cited papers.
+. reghdfe f_paperyear_min did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 66414 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    90,294
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}  61463{txt}){col 67}= {res}      3.76
+{txt}{col 51}Prob > F{col 67}= {res}    0.0524
+{txt}{col 51}R-squared{col 67}= {res}    0.4896
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2502
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    8.9756
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_paperye~in{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2}-1.933197{col 26}{space 2} .9966499{col 37}{space 1}   -1.94{col 46}{space 3}0.052{col 54}{space 4}-3.886633{col 67}{space 3} .0202397
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 2004.517{col 26}{space 2} .0299543{col 37}{space 1} 6.7e+04{col 46}{space 3}0.000{col 54}{space 4} 2004.459{col 67}{space 3} 2004.576
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    28818{col 27}{space 1}        0{col 39}{result}{space 1}    28818{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: latest publication year among cited papers.
+. reghdfe f_paperyear_max did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 66414 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 9 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    90,294
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}  61463{txt}){col 67}= {res}      4.93
+{txt}{col 51}Prob > F{col 67}= {res}    0.0265
+{txt}{col 51}R-squared{col 67}= {res}    0.6008
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4136
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    5.0240
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_paperyea~x{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2}  .800232{col 26}{space 2} .3605422{col 37}{space 1}    2.22{col 46}{space 3}0.026{col 54}{space 4} .0935684{col 67}{space 3} 1.506896
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 2011.801{col 26}{space 2} .0167494{col 37}{space 1} 1.2e+05{col 46}{space 3}0.000{col 54}{space 4} 2011.768{col 67}{space 3} 2011.834
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    28818{col 27}{space 1}        0{col 39}{result}{space 1}    28818{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: mean publication year among cited papers.
+. reghdfe f_paperyear_mean did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 66414 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    90,294
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}  61463{txt}){col 67}= {res}      6.79
+{txt}{col 51}Prob > F{col 67}= {res}    0.0092
+{txt}{col 51}R-squared{col 67}= {res}    0.5796
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3824
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    5.2531
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_paperye~an{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2}  .927228{col 26}{space 2} .3558037{col 37}{space 1}    2.61{col 46}{space 3}0.009{col 54}{space 4} .2298519{col 67}{space 3} 1.624604
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 2008.952{col 26}{space 2} .0175105{col 37}{space 1} 1.1e+05{col 46}{space 3}0.000{col 54}{space 4} 2008.917{col 67}{space 3} 2008.986
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    28818{col 27}{space 1}        0{col 39}{result}{space 1}    28818{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Model 4: median publication year among cited papers.
+. reghdfe f_paperyear_med did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 66414 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    90,294
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}  61463{txt}){col 67}= {res}      7.36
+{txt}{col 51}Prob > F{col 67}= {res}    0.0067
+{txt}{col 51}R-squared{col 67}= {res}    0.5728
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3724
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    5.3754
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_paperyea~d{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .9956284{col 26}{space 2} .3670634{col 37}{space 1}    2.71{col 46}{space 3}0.007{col 54}{space 4} .2761833{col 67}{space 3} 1.715074
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 2009.268{col 26}{space 2} .0179222{col 37}{space 1} 1.1e+05{col 46}{space 3}0.000{col 54}{space 4} 2009.233{col 67}{space 3} 2009.303
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    28818{col 27}{space 1}        0{col 39}{result}{space 1}    28818{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Export the publication-vintage estimates
+. * ==============================================================================
+. 
+. esttab M1 M2 M3 M4 using ${c -(}table_output{c )-}vintage.rtf, ///
+>         replace star( * 0.11 ** 0.05 *** 0.01 ) nogaps compress ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2, fmt(%15.0fc %9.3f) labels("Observations" "R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4") ///
+>         nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/vintage.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_vintage.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 12:20:11
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

@@ -1,0 +1,211 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_alternative_measures.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 14:28:47
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\3_Supplementary_materials\F1_Alternative_outcome\01_Alternative_measures.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—supplementary alternative outcomes
+> Script:  01_Alternative_measures.do
+> 
+> Purpose:
+>   Re-estimate the sanction effect using alternative measures of firms' reliance
+>   on science. The specifications cover patent-based outcomes and publication
+>   outcomes constructed from CNKI and Web of Science (WOS) data.
+> 
+> Main inputs:
+>   - ${c -(}RUN5_STATA_CN_CN{c )-}DID_allfirm-level.dta
+>   - ${c -(}RUN5_STATA_CNKI{c )-}CNKI_DID.dta
+>   - ${c -(}RUN5_STATA_WOS{c )-}CN_WOS_DID.dta
+> 
+> Main output:
+>   - ${c -(}RUN5_TABLE_CN_CN{c )-}robust_alternative_measures.rtf
+> 
+> Notes:
+>   Run through 3_Supplementary_materials/00_run_all.do so the RUN5_* path globals
+>   are available.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate models using patent-based alternative outcomes
+. * ==============================================================================
+. 
+. use ${c -(}RUN5_STATA_CN_CN{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Estimate the binary science-reliance outcome using linear fixed effects.
+. reghdfe f_cite_science did, absorb(year firm_id) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}2395765{txt}){col 67}= {res}     93.43
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3060
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2064
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    0.2081
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~e{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2250333{col 26}{space 2} .0232805{col 37}{space 1}    9.67{col 46}{space 3}0.000{col 54}{space 4} .1794043{col 67}{space 3} .2706624
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0578938{col 26}{space 2} .0001258{col 37}{space 1}  460.22{col 46}{space 3}0.000{col 54}{space 4} .0576473{col 67}{space 3} .0581404
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        1{col 39}{result}{space 1}   343802{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Estimate the share of science-reliant patents using linear fixed effects.
+. reghdfe f_cite_science_ratio did, absorb(year firm_id) vce(r)
+{res}{txt}(dropped 207157 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,604
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309154{txt}){col 67}= {res}      8.95
+{txt}{col 51}Prob > F{col 67}= {res}    0.0028
+{txt}{col 51}R-squared{col 67}= {res}    0.4872
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2609
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.2747
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~o{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0459119{col 26}{space 2} .0153444{col 37}{space 1}    2.99{col 46}{space 3}0.003{col 54}{space 4} .0158373{col 67}{space 3} .0759864
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1653295{col 26}{space 2} .0004118{col 37}{space 1}  401.52{col 46}{space 3}0.000{col 54}{space 4} .1645225{col 67}{space 3} .1661365
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   136437{col 27}{space 1}        1{col 39}{result}{space 1}   136436{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Estimate the CNKI publication-indicator model
+. * ==============================================================================
+. 
+. use ${c -(}RUN5_STATA_CNKI{c )-}CNKI_DID.dta, clear
+{txt}
+{com}. 
+. * Identify firm-years with more than one CNKI publication.
+. gen pub_num_dummy = 0
+{txt}
+{com}. replace pub_num_dummy=1 if pub_num>1
+{txt}(93,409 real changes made)
+
+{com}. 
+. reghdfe pub_num_dummy did, absorb(year firm_id) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,176,447
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}2009015{txt}){col 67}= {res}      4.64
+{txt}{col 51}Prob > F{col 67}= {res}    0.0312
+{txt}{col 51}R-squared{col 67}= {res}    0.3222
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2658
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.1737
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}pub_num_du~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0075965{col 26}{space 2} .0035256{col 37}{space 1}    2.15{col 46}{space 3}0.031{col 54}{space 4} .0006865{col 67}{space 3} .0145064
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0429019{col 26}{space 2} .0001179{col 37}{space 1}  363.78{col 46}{space 3}0.000{col 54}{space 4} .0426708{col 67}{space 3} .0431331
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   167419{col 27}{space 1}        1{col 39}{result}{space 1}   167418{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * ==============================================================================
+. * 3. Estimate the WOS publication-indicator model
+. * ==============================================================================
+. 
+. use ${c -(}RUN5_STATA_WOS{c )-}CN_WOS_DID.dta, clear
+{txt}
+{com}. 
+. * Construct the WOS publication indicator from the publication count.
+. gen pub_num_dummy = 1
+{txt}
+{com}. replace pub_num_dummy=0 if pub_num==0
+{txt}(995,294 real changes made)
+
+{com}. 
+. reghdfe pub_num_dummy did, absorb(year firm_id) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,153,256
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}1064531{txt}){col 67}= {res}     50.83
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2070
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1409
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    0.3187
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}pub_num_du~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0711136{col 26}{space 2} .0099743{col 37}{space 1}    7.13{col 46}{space 3}0.000{col 54}{space 4} .0515643{col 67}{space 3} .0906629
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1368409{col 26}{space 2} .0002972{col 37}{space 1}  460.39{col 46}{space 3}0.000{col 54}{space 4} .1362583{col 67}{space 3} .1374235
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    88712{col 27}{space 1}        1{col 39}{result}{space 1}    88711{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. * ==============================================================================
+. * 4. Export the combined alternative-outcome table
+. * ==============================================================================
+. 
+. esttab M1 M2 M3 M4 using ${c -(}RUN5_TABLE_CN_CN{c )-}robust_alternative_measures.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4") ///
+>         nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/robust_alternative_measures.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_alternative_measures.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 14:29:32
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

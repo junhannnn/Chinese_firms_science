@@ -1,0 +1,234 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_whether_grant.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 16:16:53
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\3_Supplementary_materials\F4_Additional_analyses\02_Whether_grant.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—supplementary additional analyses
+> Script:  02_Whether_grant.do
+> 
+> Purpose:
+>   Estimate whether examination after Entity List designation is associated with
+>   the probability that a Chinese invention-patent application is granted. Compare
+>   specifications with and without patent controls and fixed effects on a common
+>   estimation sample.
+> 
+> Main input (from ${c -(}CN_patents{c )-}):
+>   - Chinese_patent_application2010-2023.dta
+> 
+> Main output (under ${c -(}table_output{c )-}):
+>   - whether_grant.rtf: grant-outcome estimates from three specifications
+> 
+> Notes:
+>   The analysis retains Chinese applications filed from 2010 through 2022 with an
+>   observed grant or rejection outcome. `post_el` identifies decisions occurring
+>   after Entity List designation. Patent controls cover co-applicants, pages,
+>   backward citations, claims, scope, PCT status, cumulative patenting, and the
+>   rolling three-year mean number of claims.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Prepare the patent-application sample
+. * ==============================================================================
+. 
+. use "${c -(}CN_patents{c )-}Chinese_patent_application2010-2023.dta", clear
+{txt}
+{com}. 
+. keep if apply_year>=2010 & apply_year<=2022
+{txt}(192,405 observations deleted)
+
+{com}. keep if 申请人国家地区=="中国"
+{txt}(1,021,161 observations deleted)
+
+{com}. gen ln_sum_patents = ln(sum_patents+1)
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Define the common estimation sample using the most restrictive model
+. * ==============================================================================
+. 
+. reghdfe granted post_el co_applicants pages backward_citations claims patent_scope PCT ///
+>     ln_sum_patents roll3_mean_claims, ///
+>     absorb(firm_id apply_year IPC4digit) vce(cluster firm_id)
+{res}{txt}(dropped 203217 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 18 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 4,749,395
+{txt}Absorbing 3 HDFE groups{col 51}F({res}   9{txt},{res} 345506{txt}){col 67}= {res}    933.97
+{txt}Statistics robust to heteroskedasticity{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3325
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2800
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0386
+{txt}{col 1}Number of clusters ({res}firm_id{txt}) {col 30}= {res}   345,507{txt}{col 51}Root MSE{col 67}= {res}    0.4126
+
+{txt}{ralign 84:(Std. err. adjusted for {res:345,507} clusters in {res:firm_id})}
+{hline 19}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 20}{c |}{col 32}    Robust
+{col 1}           granted{col 20}{c |} Coefficient{col 32}  std. err.{col 44}      t{col 52}   P>|t|{col 60}     [95% con{col 73}f. interval]
+{hline 19}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}post_el {c |}{col 20}{res}{space 2} -.058775{col 32}{space 2} .0406429{col 43}{space 1}   -1.45{col 52}{space 3}0.148{col 60}{space 4}-.1384338{col 73}{space 3} .0208838
+{txt}{space 5}co_applicants {c |}{col 20}{res}{space 2} .0051004{col 32}{space 2} .0018641{col 43}{space 1}    2.74{col 52}{space 3}0.006{col 60}{space 4} .0014468{col 73}{space 3} .0087541
+{txt}{space 13}pages {c |}{col 20}{res}{space 2} .0149274{col 32}{space 2} .0006536{col 43}{space 1}   22.84{col 52}{space 3}0.000{col 60}{space 4} .0136465{col 73}{space 3} .0162084
+{txt}backward_citations {c |}{col 20}{res}{space 2} .0168941{col 32}{space 2} .0002164{col 43}{space 1}   78.07{col 52}{space 3}0.000{col 60}{space 4}   .01647{col 73}{space 3} .0173182
+{txt}{space 12}claims {c |}{col 20}{res}{space 2} .0008606{col 32}{space 2} .0003558{col 43}{space 1}    2.42{col 52}{space 3}0.016{col 60}{space 4} .0001632{col 73}{space 3}  .001558
+{txt}{space 6}patent_scope {c |}{col 20}{res}{space 2} -.005255{col 32}{space 2} .0004821{col 43}{space 1}  -10.90{col 52}{space 3}0.000{col 60}{space 4}-.0061999{col 73}{space 3}-.0043102
+{txt}{space 15}PCT {c |}{col 20}{res}{space 2} .0904857{col 32}{space 2} .0187336{col 43}{space 1}    4.83{col 52}{space 3}0.000{col 60}{space 4} .0537685{col 73}{space 3}  .127203
+{txt}{space 4}ln_sum_patents {c |}{col 20}{res}{space 2}-.0087223{col 32}{space 2} .0025795{col 43}{space 1}   -3.38{col 52}{space 3}0.001{col 60}{space 4}-.0137781{col 73}{space 3}-.0036664
+{txt}{space 1}roll3_mean_claims {c |}{col 20}{res}{space 2}  .003042{col 32}{space 2} .0011473{col 43}{space 1}    2.65{col 52}{space 3}0.008{col 60}{space 4} .0007933{col 73}{space 3} .0052907
+{txt}{space 13}_cons {c |}{col 20}{res}{space 2} .3404929{col 32}{space 2} .0135168{col 43}{space 1}   25.19{col 52}{space 3}0.000{col 60}{space 4} .3140003{col 73}{space 3} .3669854
+{txt}{hline 19}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   345507{col 27}{space 1}   345507{col 39}{result}{space 1}        0{col 53}{text}*{col 54}{c |}
+{res}{col 1}{text}  apply_year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}   IPC4digit{col 14}{c |}{space 1}      630{col 27}{space 1}        1{col 39}{result}{space 1}      629{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+* = FE nested within cluster; treated as redundant for DoF computation
+{res}{txt}
+{com}. 
+. gen byte common_sample = e(sample)
+{txt}
+{com}. 
+. * ==============================================================================
+. * 3. Estimate all specifications on the common sample
+. * ==============================================================================
+. 
+. reghdfe granted post_el if common_sample == 1, ///
+>     absorb(firm_id apply_year IPC4digit) vce(cluster firm_id)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 17 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 4,749,395
+{txt}Absorbing 3 HDFE groups{col 51}F({res}   1{txt},{res} 345506{txt}){col 67}= {res}      0.10
+{txt}Statistics robust to heteroskedasticity{col 51}Prob > F{col 67}= {res}    0.7470
+{txt}{col 51}R-squared{col 67}= {res}    0.3057
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2511
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 1}Number of clusters ({res}firm_id{txt}) {col 30}= {res}   345,507{txt}{col 51}Root MSE{col 67}= {res}    0.4208
+
+{txt}{ralign 78:(Std. err. adjusted for {res:345,507} clusters in {res:firm_id})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     granted{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}post_el {c |}{col 14}{res}{space 2}-.0195221{col 26}{space 2} .0605235{col 37}{space 1}   -0.32{col 46}{space 3}0.747{col 54}{space 4}-.1381464{col 67}{space 3} .0991022
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .6167701{col 26}{space 2} .0010566{col 37}{space 1}  583.71{col 46}{space 3}0.000{col 54}{space 4} .6146991{col 67}{space 3}  .618841
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   345507{col 27}{space 1}   345507{col 39}{result}{space 1}        0{col 53}{text}*{col 54}{c |}
+{res}{col 1}{text}  apply_year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}   IPC4digit{col 14}{c |}{space 1}      630{col 27}{space 1}        1{col 39}{result}{space 1}      629{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+* = FE nested within cluster; treated as redundant for DoF computation
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. reghdfe granted post_el co_applicants pages backward_citations claims patent_scope PCT ///
+>     ln_sum_patents roll3_mean_claims if common_sample == 1, ///
+>     vce(cluster firm_id)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 1 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 4,749,395
+{txt}Absorbing 1 HDFE group{col 51}F({res}   9{txt},{res} 345506{txt}){col 67}= {res}   1600.52
+{txt}Statistics robust to heteroskedasticity{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.1028
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1028
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.1028
+{txt}{col 1}Number of clusters ({res}firm_id{txt}) {col 30}= {res}   345,507{txt}{col 51}Root MSE{col 67}= {res}    0.4606
+
+{txt}{ralign 84:(Std. err. adjusted for {res:345,507} clusters in {res:firm_id})}
+{hline 19}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 20}{c |}{col 32}    Robust
+{col 1}           granted{col 20}{c |} Coefficient{col 32}  std. err.{col 44}      t{col 52}   P>|t|{col 60}     [95% con{col 73}f. interval]
+{hline 19}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}post_el {c |}{col 20}{res}{space 2}-.0366143{col 32}{space 2} .0255732{col 43}{space 1}   -1.43{col 52}{space 3}0.152{col 60}{space 4} -.086737{col 73}{space 3} .0135085
+{txt}{space 5}co_applicants {c |}{col 20}{res}{space 2} .0313746{col 32}{space 2} .0055203{col 43}{space 1}    5.68{col 52}{space 3}0.000{col 60}{space 4} .0205549{col 73}{space 3} .0421943
+{txt}{space 13}pages {c |}{col 20}{res}{space 2} .0188797{col 32}{space 2} .0007843{col 43}{space 1}   24.07{col 52}{space 3}0.000{col 60}{space 4} .0173425{col 73}{space 3} .0204168
+{txt}backward_citations {c |}{col 20}{res}{space 2} .0184635{col 32}{space 2} .0002741{col 43}{space 1}   67.37{col 52}{space 3}0.000{col 60}{space 4} .0179263{col 73}{space 3} .0190007
+{txt}{space 12}claims {c |}{col 20}{res}{space 2} .0022859{col 32}{space 2} .0006955{col 43}{space 1}    3.29{col 52}{space 3}0.001{col 60}{space 4} .0009228{col 73}{space 3}  .003649
+{txt}{space 6}patent_scope {c |}{col 20}{res}{space 2}-.0193106{col 32}{space 2} .0011666{col 43}{space 1}  -16.55{col 52}{space 3}0.000{col 60}{space 4} -.021597{col 73}{space 3}-.0170241
+{txt}{space 15}PCT {c |}{col 20}{res}{space 2} .0633202{col 32}{space 2} .0451783{col 43}{space 1}    1.40{col 52}{space 3}0.161{col 60}{space 4}-.0252279{col 73}{space 3} .1518683
+{txt}{space 4}ln_sum_patents {c |}{col 20}{res}{space 2} .0024673{col 32}{space 2} .0017867{col 43}{space 1}    1.38{col 52}{space 3}0.167{col 60}{space 4}-.0010346{col 73}{space 3} .0059693
+{txt}{space 1}roll3_mean_claims {c |}{col 20}{res}{space 2} .0031923{col 32}{space 2} .0009513{col 43}{space 1}    3.36{col 52}{space 3}0.001{col 60}{space 4} .0013278{col 73}{space 3} .0050569
+{txt}{space 13}_cons {c |}{col 20}{res}{space 2} .2383783{col 32}{space 2} .0075567{col 43}{space 1}   31.55{col 52}{space 3}0.000{col 60}{space 4} .2235673{col 73}{space 3} .2531893
+{txt}{hline 19}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. est store M2
+{txt}
+{com}. 
+. reghdfe granted post_el co_applicants pages backward_citations claims patent_scope PCT ///
+>     ln_sum_patents roll3_mean_claims if common_sample == 1, ///
+>     absorb(firm_id apply_year IPC4digit) vce(cluster firm_id)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 18 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 4,749,395
+{txt}Absorbing 3 HDFE groups{col 51}F({res}   9{txt},{res} 345506{txt}){col 67}= {res}    933.97
+{txt}Statistics robust to heteroskedasticity{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3325
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2800
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0386
+{txt}{col 1}Number of clusters ({res}firm_id{txt}) {col 30}= {res}   345,507{txt}{col 51}Root MSE{col 67}= {res}    0.4126
+
+{txt}{ralign 84:(Std. err. adjusted for {res:345,507} clusters in {res:firm_id})}
+{hline 19}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 20}{c |}{col 32}    Robust
+{col 1}           granted{col 20}{c |} Coefficient{col 32}  std. err.{col 44}      t{col 52}   P>|t|{col 60}     [95% con{col 73}f. interval]
+{hline 19}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}post_el {c |}{col 20}{res}{space 2} -.058775{col 32}{space 2} .0406429{col 43}{space 1}   -1.45{col 52}{space 3}0.148{col 60}{space 4}-.1384338{col 73}{space 3} .0208838
+{txt}{space 5}co_applicants {c |}{col 20}{res}{space 2} .0051004{col 32}{space 2} .0018641{col 43}{space 1}    2.74{col 52}{space 3}0.006{col 60}{space 4} .0014468{col 73}{space 3} .0087541
+{txt}{space 13}pages {c |}{col 20}{res}{space 2} .0149274{col 32}{space 2} .0006536{col 43}{space 1}   22.84{col 52}{space 3}0.000{col 60}{space 4} .0136465{col 73}{space 3} .0162084
+{txt}backward_citations {c |}{col 20}{res}{space 2} .0168941{col 32}{space 2} .0002164{col 43}{space 1}   78.07{col 52}{space 3}0.000{col 60}{space 4}   .01647{col 73}{space 3} .0173182
+{txt}{space 12}claims {c |}{col 20}{res}{space 2} .0008606{col 32}{space 2} .0003558{col 43}{space 1}    2.42{col 52}{space 3}0.016{col 60}{space 4} .0001632{col 73}{space 3}  .001558
+{txt}{space 6}patent_scope {c |}{col 20}{res}{space 2} -.005255{col 32}{space 2} .0004821{col 43}{space 1}  -10.90{col 52}{space 3}0.000{col 60}{space 4}-.0061999{col 73}{space 3}-.0043102
+{txt}{space 15}PCT {c |}{col 20}{res}{space 2} .0904857{col 32}{space 2} .0187336{col 43}{space 1}    4.83{col 52}{space 3}0.000{col 60}{space 4} .0537685{col 73}{space 3}  .127203
+{txt}{space 4}ln_sum_patents {c |}{col 20}{res}{space 2}-.0087223{col 32}{space 2} .0025795{col 43}{space 1}   -3.38{col 52}{space 3}0.001{col 60}{space 4}-.0137781{col 73}{space 3}-.0036664
+{txt}{space 1}roll3_mean_claims {c |}{col 20}{res}{space 2}  .003042{col 32}{space 2} .0011473{col 43}{space 1}    2.65{col 52}{space 3}0.008{col 60}{space 4} .0007933{col 73}{space 3} .0052907
+{txt}{space 13}_cons {c |}{col 20}{res}{space 2} .3404929{col 32}{space 2} .0135168{col 43}{space 1}   25.19{col 52}{space 3}0.000{col 60}{space 4} .3140003{col 73}{space 3} .3669854
+{txt}{hline 19}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   345507{col 27}{space 1}   345507{col 39}{result}{space 1}        0{col 53}{text}*{col 54}{c |}
+{res}{col 1}{text}  apply_year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}   IPC4digit{col 14}{c |}{space 1}      630{col 27}{space 1}        1{col 39}{result}{space 1}      629{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+* = FE nested within cluster; treated as redundant for DoF computation
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. * ==============================================================================
+. * 4. Export the grant-outcome results table
+. * ==============================================================================
+. 
+. esttab M1 M2 M3 using ${c -(}table_output{c )-}whether_grant.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3") ///
+>         note("Firm, year, and IPC subclass FE")
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/whether_grant.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_whether_grant.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 16:19:02
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

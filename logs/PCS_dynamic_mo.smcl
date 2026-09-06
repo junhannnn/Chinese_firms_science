@@ -1,0 +1,1312 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_dynamic_mo.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 13:59:46
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\2_Chinese_publicly_listed_firms\04_dynamic_effect_mo.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—Chinese publicly listed firms
+> Script:  04_dynamic_effect_mo.do
+> 
+> Purpose:
+>   Estimate event-study effects separately for firms with low and high dependence
+>   on U.S. technology. Compare all Chinese firms with publicly listed firms in
+>   the full and CEM-matched samples, then construct publication-ready plots.
+> 
+> Main inputs (from ${c -(}stata_output{c )-}):
+>   - DID_allfirm_mo.dta
+>   - DID_allfirm_mo_cem.dta
+>   - DID_listedfirm_mo.dta
+>   - DID_listedfirm_mo_cem.dta
+> 
+> Main outputs:
+>   - ${c -(}stata_output{c )-}ROS_event_table_mo.dta: subgroup event-time estimates and bounds
+>   - ${c -(}figure_output{c )-}main_dynamic_low_legendoff.gph: low-dependence plot
+>   - ${c -(}figure_output{c )-}main_dynamic_high_legendoff.gph: high-dependence plot
+> 
+> Notes:
+>   Run through 00_run_all.do so the shared path globals are available. Temporary
+>   graph files are deleted after use. 
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate moderator event studies for all Chinese firms
+. * ==============================================================================
+. 
+. * Full sample.
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm_mo.dta, clear
+{txt}
+{com}. 
+. drop if dif_year!=. & !inrange(dif_year,-3,3)
+{txt}(1,798 observations deleted)
+
+{com}.                          
+. eventdd f_cite_science_num_w whether_pat, over(moderator) jitter(0.2) timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("Chinese firms""(full sample)") ///
+>              xtitle("Sanction Year") ///
+>              xscale(range(-3 3)) ///
+>                          yscale(range(-1 1)) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>                          mcolor("ebblue*1.2" "red*1.4") ///
+>              scheme(journal) ///
+>                          legend(order(2 4) rows(2) position(11) ring(0) region(lcolor(none))))
+{res}
+
+                    Group 1: moderator=0
+{txt}(dropped 1 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,484,546
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}1300580{txt}){col 67}= {res}   9144.94
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3924
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3064
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0783
+{txt}{col 51}Root MSE{col 67}= {res}    0.3155
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2}  .256459{col 26}{space 2} .0010139{col 37}{space 1}  252.94{col 46}{space 3}0.000{col 54}{space 4} .2544717{col 67}{space 3} .2584462
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.2591391{col 26}{space 2} .1404607{col 37}{space 1}   -1.84{col 46}{space 3}0.065{col 54}{space 4}-.5344373{col 67}{space 3} .0161591
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.2178469{col 26}{space 2} .1383665{col 37}{space 1}   -1.57{col 46}{space 3}0.115{col 54}{space 4}-.4890406{col 67}{space 3} .0533468
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2}-.0881626{col 26}{space 2} .1358072{col 37}{space 1}   -0.65{col 46}{space 3}0.516{col 54}{space 4}  -.35434{col 67}{space 3} .1780149
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .4199211{col 26}{space 2} .1622839{col 37}{space 1}    2.59{col 46}{space 3}0.010{col 54}{space 4} .1018502{col 67}{space 3} .7379921
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .5636452{col 26}{space 2} .1937553{col 37}{space 1}    2.91{col 46}{space 3}0.004{col 54}{space 4} .1838914{col 67}{space 3} .9433991
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .4766919{col 26}{space 2} .2421992{col 37}{space 1}    1.97{col 46}{space 3}0.049{col 54}{space 4} .0019898{col 67}{space 3} .9513941
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0167258{col 26}{space 2}  .000231{col 37}{space 1}   72.41{col 46}{space 3}0.000{col 54}{space 4} .0162731{col 67}{space 3} .0171785
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   183947{col 27}{space 1}        1{col 39}{result}{space 1}   183946{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}
+
+                    Group 2: moderator=1
+{txt}(dropped 4 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,253,232
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}1093380{txt}){col 67}= {res}   7027.77
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4626
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3840
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0624
+{txt}{col 51}Root MSE{col 67}= {res}    0.3785
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2} .2732641{col 26}{space 2}  .001233{col 37}{space 1}  221.63{col 46}{space 3}0.000{col 54}{space 4} .2708475{col 67}{space 3} .2756807
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.6041646{col 26}{space 2} .1261831{col 37}{space 1}   -4.79{col 46}{space 3}0.000{col 54}{space 4}-.8514792{col 67}{space 3}  -.35685
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.3873879{col 26}{space 2} .1162557{col 37}{space 1}   -3.33{col 46}{space 3}0.001{col 54}{space 4}-.6152451{col 67}{space 3}-.1595307
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} -.219668{col 26}{space 2} .1102828{col 37}{space 1}   -1.99{col 46}{space 3}0.046{col 54}{space 4}-.4358186{col 67}{space 3}-.0035173
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .1622885{col 26}{space 2} .1298506{col 37}{space 1}    1.25{col 46}{space 3}0.211{col 54}{space 4}-.0922143{col 67}{space 3} .4167913
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .4024216{col 26}{space 2}  .136866{col 37}{space 1}    2.94{col 46}{space 3}0.003{col 54}{space 4} .1341688{col 67}{space 3} .6706744
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .4540179{col 26}{space 2} .2236677{col 37}{space 1}    2.03{col 46}{space 3}0.042{col 54}{space 4} .0156369{col 67}{space 3}  .892399
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0382311{col 26}{space 2}  .000335{col 37}{space 1}  114.12{col 46}{space 3}0.000{col 54}{space 4} .0375745{col 67}{space 3} .0388877
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   159833{col 27}{space 1}        1{col 39}{result}{space 1}   159832{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. 
+. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text.Arrpush low U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text.Arrpush high U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.key[2].view.style.editstyle marker(symbol(triangle)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. gr_edit .plotregion1.plot1.style.editstyle area(linestyle(color(red*1.4))) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1.plot3.style.editstyle area(linestyle(color(ebblue*1.2))) editcopy
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic_mo_1.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_1.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_1.gph} saved
+
+{com}. 
+. * Store separate low- and high-dependence models for coefficient extraction.
+. eventdd f_cite_science_num_w whether_pat if moderator == 0, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 1 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,484,546
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}1300580{txt}){col 67}= {res}   9144.94
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3924
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3064
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0783
+{txt}{col 51}Root MSE{col 67}= {res}    0.3155
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2}  .256459{col 26}{space 2} .0010139{col 37}{space 1}  252.94{col 46}{space 3}0.000{col 54}{space 4} .2544717{col 67}{space 3} .2584462
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.2591391{col 26}{space 2} .1404607{col 37}{space 1}   -1.84{col 46}{space 3}0.065{col 54}{space 4}-.5344373{col 67}{space 3} .0161591
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.2178469{col 26}{space 2} .1383665{col 37}{space 1}   -1.57{col 46}{space 3}0.115{col 54}{space 4}-.4890406{col 67}{space 3} .0533468
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2}-.0881626{col 26}{space 2} .1358072{col 37}{space 1}   -0.65{col 46}{space 3}0.516{col 54}{space 4}  -.35434{col 67}{space 3} .1780149
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .4199211{col 26}{space 2} .1622839{col 37}{space 1}    2.59{col 46}{space 3}0.010{col 54}{space 4} .1018502{col 67}{space 3} .7379921
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .5636452{col 26}{space 2} .1937553{col 37}{space 1}    2.91{col 46}{space 3}0.004{col 54}{space 4} .1838914{col 67}{space 3} .9433991
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .4766919{col 26}{space 2} .2421992{col 37}{space 1}    1.97{col 46}{space 3}0.049{col 54}{space 4} .0019898{col 67}{space 3} .9513941
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0167258{col 26}{space 2}  .000231{col 37}{space 1}   72.41{col 46}{space 3}0.000{col 54}{space 4} .0162731{col 67}{space 3} .0171785
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   183947{col 27}{space 1}        1{col 39}{result}{space 1}   183946{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. eventdd f_cite_science_num_w whether_pat if moderator == 1, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 4 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,253,232
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}1093380{txt}){col 67}= {res}   7027.77
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4626
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3840
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0624
+{txt}{col 51}Root MSE{col 67}= {res}    0.3785
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2} .2732641{col 26}{space 2}  .001233{col 37}{space 1}  221.63{col 46}{space 3}0.000{col 54}{space 4} .2708475{col 67}{space 3} .2756807
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.6041646{col 26}{space 2} .1261831{col 37}{space 1}   -4.79{col 46}{space 3}0.000{col 54}{space 4}-.8514792{col 67}{space 3}  -.35685
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.3873879{col 26}{space 2} .1162557{col 37}{space 1}   -3.33{col 46}{space 3}0.001{col 54}{space 4}-.6152451{col 67}{space 3}-.1595307
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} -.219668{col 26}{space 2} .1102828{col 37}{space 1}   -1.99{col 46}{space 3}0.046{col 54}{space 4}-.4358186{col 67}{space 3}-.0035173
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .1622885{col 26}{space 2} .1298506{col 37}{space 1}    1.25{col 46}{space 3}0.211{col 54}{space 4}-.0922143{col 67}{space 3} .4167913
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .4024216{col 26}{space 2}  .136866{col 37}{space 1}    2.94{col 46}{space 3}0.003{col 54}{space 4} .1341688{col 67}{space 3} .6706744
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .4540179{col 26}{space 2} .2236677{col 37}{space 1}    2.03{col 46}{space 3}0.042{col 54}{space 4} .0156369{col 67}{space 3}  .892399
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0382311{col 26}{space 2}  .000335{col 37}{space 1}  114.12{col 46}{space 3}0.000{col 54}{space 4} .0375745{col 67}{space 3} .0388877
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}   159833{col 27}{space 1}        1{col 39}{result}{space 1}   159832{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. * CEM-matched sample.
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm_mo_cem.dta, clear
+{txt}
+{com}. 
+. drop if dif_year!=. & !inrange(dif_year,-3,3)
+{txt}(1,798 observations deleted)
+
+{com}. keep if cem_matched==1
+{txt}(2,027,729 observations deleted)
+
+{com}.                  
+. eventdd f_cite_science_num_w whether_pat [aweight=cem_weights], over(moderator) jitter(0.2) timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("Chinese firms""(matched sample)") ///
+>              xtitle("Sanction Year") ///
+>              xscale(range(-3 3)) ///
+>                          yscale(range(-1 1)) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>                          mcolor("ebblue*1.2" "red*1.4") ///
+>              scheme(journal) ///
+>                          legend(order(2 4) rows(2) position(11) ring(0) region(lcolor(none))))                   
+{res}
+
+                    Group 1: moderator=0
+{txt}(dropped 1 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   356,800
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res} 313528{txt}){col 67}= {res}     38.72
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4424
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3654
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.1078
+{txt}{col 51}Root MSE{col 67}= {res}    0.5719
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2} .5340681{col 26}{space 2} .0332449{col 37}{space 1}   16.06{col 46}{space 3}0.000{col 54}{space 4} .4689091{col 67}{space 3} .5992271
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2} .1094779{col 26}{space 2} .1395529{col 37}{space 1}    0.78{col 46}{space 3}0.433{col 54}{space 4}-.1640419{col 67}{space 3} .3829976
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2} .1685418{col 26}{space 2} .1364495{col 37}{space 1}    1.24{col 46}{space 3}0.217{col 54}{space 4}-.0988953{col 67}{space 3} .4359789
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2}  .107986{col 26}{space 2}  .138724{col 37}{space 1}    0.78{col 46}{space 3}0.436{col 54}{space 4}-.1639092{col 67}{space 3} .3798812
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .3843887{col 26}{space 2} .1704911{col 37}{space 1}    2.25{col 46}{space 3}0.024{col 54}{space 4}  .050231{col 67}{space 3} .7185465
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .4333532{col 26}{space 2} .2170335{col 37}{space 1}    2.00{col 46}{space 3}0.046{col 54}{space 4} .0079737{col 67}{space 3} .8587326
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .2945502{col 26}{space 2} .2767247{col 37}{space 1}    1.06{col 46}{space 3}0.287{col 54}{space 4}-.2478223{col 67}{space 3} .8369227
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}    .0457{col 26}{space 2} .0114961{col 37}{space 1}    3.98{col 46}{space 3}0.000{col 54}{space 4}  .023168{col 67}{space 3}  .068232
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    43253{col 27}{space 1}        1{col 39}{result}{space 1}    43252{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}
+
+                    Group 2: moderator=1
+{txt}(dropped 4 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   353,249
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res} 308824{txt}){col 67}= {res}     33.53
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5356
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4688
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0753
+{txt}{col 51}Root MSE{col 67}= {res}    0.8917
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2}  .697788{col 26}{space 2} .0461874{col 37}{space 1}   15.11{col 46}{space 3}0.000{col 54}{space 4}  .607262{col 67}{space 3} .7883139
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.1330775{col 26}{space 2}  .150699{col 37}{space 1}   -0.88{col 46}{space 3}0.377{col 54}{space 4}-.4284433{col 67}{space 3} .1622883
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.1121096{col 26}{space 2} .1396005{col 37}{space 1}   -0.80{col 46}{space 3}0.422{col 54}{space 4}-.3857227{col 67}{space 3} .1615035
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0294996{col 26}{space 2} .1333393{col 37}{space 1}    0.22{col 46}{space 3}0.825{col 54}{space 4}-.2318417{col 67}{space 3} .2908409
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2}-.0189512{col 26}{space 2} .1623849{col 37}{space 1}   -0.12{col 46}{space 3}0.907{col 54}{space 4}-.3372209{col 67}{space 3} .2993186
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .1172154{col 26}{space 2} .1816379{col 37}{space 1}    0.65{col 46}{space 3}0.519{col 54}{space 4}-.2387897{col 67}{space 3} .4732205
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .1994114{col 26}{space 2} .2933479{col 37}{space 1}    0.68{col 46}{space 3}0.497{col 54}{space 4}-.3755423{col 67}{space 3}  .774365
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .278449{col 26}{space 2} .0244445{col 37}{space 1}   11.39{col 46}{space 3}0.000{col 54}{space 4} .2305386{col 67}{space 3} .3263595
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    44406{col 27}{space 1}        1{col 39}{result}{space 1}    44405{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}.                          
+. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text.Arrpush low U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text.Arrpush high U.S. tech dependence 
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.key[2].view.style.editstyle marker(symbol(triangle)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. gr_edit .plotregion1.plot1.style.editstyle area(linestyle(color(red*1.4))) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1.plot3.style.editstyle area(linestyle(color(ebblue*1.2))) editcopy
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic_mo_2.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_2.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_2.gph} saved
+
+{com}. 
+. * Store weighted subgroup models for coefficient extraction.
+. eventdd f_cite_science_num_w whether_pat [aweight=cem_weights] if moderator == 0, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 1 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   356,800
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res} 313528{txt}){col 67}= {res}     38.72
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4424
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3654
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.1078
+{txt}{col 51}Root MSE{col 67}= {res}    0.5719
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2} .5340681{col 26}{space 2} .0332449{col 37}{space 1}   16.06{col 46}{space 3}0.000{col 54}{space 4} .4689091{col 67}{space 3} .5992271
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2} .1094779{col 26}{space 2} .1395529{col 37}{space 1}    0.78{col 46}{space 3}0.433{col 54}{space 4}-.1640419{col 67}{space 3} .3829976
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2} .1685418{col 26}{space 2} .1364495{col 37}{space 1}    1.24{col 46}{space 3}0.217{col 54}{space 4}-.0988953{col 67}{space 3} .4359789
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2}  .107986{col 26}{space 2}  .138724{col 37}{space 1}    0.78{col 46}{space 3}0.436{col 54}{space 4}-.1639092{col 67}{space 3} .3798812
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2} .3843887{col 26}{space 2} .1704911{col 37}{space 1}    2.25{col 46}{space 3}0.024{col 54}{space 4}  .050231{col 67}{space 3} .7185465
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .4333532{col 26}{space 2} .2170335{col 37}{space 1}    2.00{col 46}{space 3}0.046{col 54}{space 4} .0079737{col 67}{space 3} .8587326
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .2945502{col 26}{space 2} .2767247{col 37}{space 1}    1.06{col 46}{space 3}0.287{col 54}{space 4}-.2478223{col 67}{space 3} .8369227
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}    .0457{col 26}{space 2} .0114961{col 37}{space 1}    3.98{col 46}{space 3}0.000{col 54}{space 4}  .023168{col 67}{space 3}  .068232
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    43253{col 27}{space 1}        1{col 39}{result}{space 1}    43252{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. eventdd f_cite_science_num_w whether_pat [aweight=cem_weights] if moderator == 1, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 4 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   353,249
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res} 308824{txt}){col 67}= {res}     33.53
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5356
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4688
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0753
+{txt}{col 51}Root MSE{col 67}= {res}    0.8917
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}whether_pat {c |}{col 14}{res}{space 2}  .697788{col 26}{space 2} .0461874{col 37}{space 1}   15.11{col 46}{space 3}0.000{col 54}{space 4}  .607262{col 67}{space 3} .7883139
+{txt}{space 7}lead3 {c |}{col 14}{res}{space 2}-.1330775{col 26}{space 2}  .150699{col 37}{space 1}   -0.88{col 46}{space 3}0.377{col 54}{space 4}-.4284433{col 67}{space 3} .1622883
+{txt}{space 7}lead2 {c |}{col 14}{res}{space 2}-.1121096{col 26}{space 2} .1396005{col 37}{space 1}   -0.80{col 46}{space 3}0.422{col 54}{space 4}-.3857227{col 67}{space 3} .1615035
+{txt}{space 7}lead1 {c |}{col 14}{res}{space 2} .0294996{col 26}{space 2} .1333393{col 37}{space 1}    0.22{col 46}{space 3}0.825{col 54}{space 4}-.2318417{col 67}{space 3} .2908409
+{txt}{space 8}lag1 {c |}{col 14}{res}{space 2}-.0189512{col 26}{space 2} .1623849{col 37}{space 1}   -0.12{col 46}{space 3}0.907{col 54}{space 4}-.3372209{col 67}{space 3} .2993186
+{txt}{space 8}lag2 {c |}{col 14}{res}{space 2} .1172154{col 26}{space 2} .1816379{col 37}{space 1}    0.65{col 46}{space 3}0.519{col 54}{space 4}-.2387897{col 67}{space 3} .4732205
+{txt}{space 8}lag3 {c |}{col 14}{res}{space 2} .1994114{col 26}{space 2} .2933479{col 37}{space 1}    0.68{col 46}{space 3}0.497{col 54}{space 4}-.3755423{col 67}{space 3}  .774365
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .278449{col 26}{space 2} .0244445{col 37}{space 1}   11.39{col 46}{space 3}0.000{col 54}{space 4} .2305386{col 67}{space 3} .3263595
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    44406{col 27}{space 1}        1{col 39}{result}{space 1}    44405{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. * ==============================================================================
+. * 2. Estimate moderator event studies for publicly listed firms
+. * ==============================================================================
+. 
+. * Full sample.
+. 
+. use ${c -(}stata_output{c )-}DID_listedfirm_mo.dta, clear
+{txt}
+{com}. 
+. global controls firm_size cash RDSpendSumRatio ROA AssetLiabilityRatio TobinQ academic_experience
+{txt}
+{com}. 
+. drop if dif_year!=. & !inrange(dif_year,-3,3)
+{txt}(481 observations deleted)
+
+{com}. 
+. 
+. eventdd f_cite_science_num_w whether_pat $controls, over(moderator) jitter(0.2) timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("Chinese publicly listed firms""(full sample)") ///
+>              xtitle("Sanction Year") ///
+>              xscale(range(-3 3)) ///
+>                          yscale(range(-1 1)) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>                          mcolor("ebblue*1.2" "red*1.4") ///
+>              scheme(journal) ///
+>                          legend(order(2 4) rows(2) position(11) ring(0) region(lcolor(none))))
+{res}
+
+                    Group 1: moderator=0
+{txt}(dropped 121 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    13,071
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}  11255{txt}){col 67}= {res}     40.35
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.6589
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6039
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0315
+{txt}{col 51}Root MSE{col 67}= {res}    1.7249
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .6620565{col 33}{space 2} .0289997{col 44}{space 1}   22.83{col 53}{space 3}0.000{col 61}{space 4} .6052119{col 74}{space 3}  .718901
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2}-.0561953{col 33}{space 2} .0446689{col 44}{space 1}   -1.26{col 53}{space 3}0.208{col 61}{space 4}-.1437542{col 74}{space 3} .0313636
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0669834{col 33}{space 2} .0262753{col 44}{space 1}    2.55{col 53}{space 3}0.011{col 61}{space 4} .0154791{col 74}{space 3} .1184877
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2}  .016345{col 33}{space 2} .0082335{col 44}{space 1}    1.99{col 53}{space 3}0.047{col 61}{space 4} .0002059{col 74}{space 3} .0324841
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-.5101644{col 33}{space 2} .3249096{col 44}{space 1}   -1.57{col 53}{space 3}0.116{col 61}{space 4}-1.147044{col 74}{space 3} .1267152
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.2907803{col 33}{space 2} .1920227{col 44}{space 1}   -1.51{col 53}{space 3}0.130{col 61}{space 4}-.6671783{col 74}{space 3} .0856178
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0014822{col 33}{space 2} .0208657{col 44}{space 1}   -0.07{col 53}{space 3}0.943{col 61}{space 4}-.0423825{col 74}{space 3} .0394182
+{txt}academic_experience {c |}{col 21}{res}{space 2} .8702184{col 33}{space 2} .3916471{col 44}{space 1}    2.22{col 53}{space 3}0.026{col 61}{space 4} .1025217{col 74}{space 3} 1.637915
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-1.065262{col 33}{space 2} .5218177{col 44}{space 1}   -2.04{col 53}{space 3}0.041{col 61}{space 4}-2.088116{col 74}{space 3}-.0424081
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.9676059{col 33}{space 2} .4723585{col 44}{space 1}   -2.05{col 53}{space 3}0.041{col 61}{space 4}-1.893511{col 74}{space 3}-.0417006
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2}-.8159315{col 33}{space 2} .4060271{col 44}{space 1}   -2.01{col 53}{space 3}0.045{col 61}{space 4}-1.611816{col 74}{space 3}-.0200473
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} .8031943{col 33}{space 2} .3890646{col 44}{space 1}    2.06{col 53}{space 3}0.039{col 61}{space 4} .0405598{col 74}{space 3} 1.565829
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 1.721754{col 33}{space 2} .7405976{col 44}{space 1}    2.32{col 53}{space 3}0.020{col 61}{space 4} .2700537{col 74}{space 3} 3.173455
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} .9007068{col 33}{space 2} .7559086{col 44}{space 1}    1.19{col 53}{space 3}0.233{col 61}{space 4}-.5810062{col 74}{space 3}  2.38242
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}  .212543{col 33}{space 2}  .999384{col 44}{space 1}    0.21{col 53}{space 3}0.832{col 61}{space 4}-1.746424{col 74}{space 3}  2.17151
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1790{col 27}{space 1}        1{col 39}{result}{space 1}     1789{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}
+
+                    Group 2: moderator=1
+{txt}(dropped 155 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}     9,721
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   8367{txt}){col 67}= {res}     22.45
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7286
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6847
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0413
+{txt}{col 51}Root MSE{col 67}= {res}    2.3749
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2}   .60478{col 33}{space 2} .0423181{col 44}{space 1}   14.29{col 53}{space 3}0.000{col 61}{space 4}  .521826{col 74}{space 3}  .687734
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2} .1109554{col 33}{space 2}  .074491{col 44}{space 1}    1.49{col 53}{space 3}0.136{col 61}{space 4}-.0350655{col 74}{space 3} .2569763
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .2575173{col 33}{space 2}  .049212{col 44}{space 1}    5.23{col 53}{space 3}0.000{col 61}{space 4} .1610497{col 74}{space 3} .3539849
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0327174{col 33}{space 2} .0123086{col 44}{space 1}    2.66{col 53}{space 3}0.008{col 61}{space 4} .0085896{col 74}{space 3} .0568453
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-1.133328{col 33}{space 2} .4699555{col 44}{space 1}   -2.41{col 53}{space 3}0.016{col 61}{space 4}-2.054557{col 74}{space 3}-.2120988
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.3950024{col 33}{space 2} .2209422{col 44}{space 1}   -1.79{col 53}{space 3}0.074{col 61}{space 4}-.8281039{col 74}{space 3} .0380991
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0420172{col 33}{space 2} .0303791{col 44}{space 1}   -1.38{col 53}{space 3}0.167{col 61}{space 4}-.1015679{col 74}{space 3} .0175334
+{txt}academic_experience {c |}{col 21}{res}{space 2}-.3047316{col 33}{space 2} .5764335{col 44}{space 1}   -0.53{col 53}{space 3}0.597{col 61}{space 4}-1.434684{col 74}{space 3} .8252208
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.7253243{col 33}{space 2} .7456772{col 44}{space 1}   -0.97{col 53}{space 3}0.331{col 61}{space 4}-2.187036{col 74}{space 3} .7363875
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.4709362{col 33}{space 2} .7273598{col 44}{space 1}   -0.65{col 53}{space 3}0.517{col 61}{space 4}-1.896741{col 74}{space 3} .9548691
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} .0373062{col 33}{space 2} .7203229{col 44}{space 1}    0.05{col 53}{space 3}0.959{col 61}{space 4}-1.374705{col 74}{space 3} 1.449317
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2}  1.49067{col 33}{space 2} .7595447{col 44}{space 1}    1.96{col 53}{space 3}0.050{col 61}{space 4} .0017748{col 74}{space 3} 2.979566
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 4.175961{col 33}{space 2}  .906466{col 44}{space 1}    4.61{col 53}{space 3}0.000{col 61}{space 4} 2.399063{col 74}{space 3} 5.952858
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} 6.752728{col 33}{space 2} 1.930215{col 44}{space 1}    3.50{col 53}{space 3}0.000{col 61}{space 4} 2.969029{col 74}{space 3} 10.53643
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}-6.319139{col 33}{space 2} 1.618908{col 44}{space 1}   -3.90{col 53}{space 3}0.000{col 61}{space 4}-9.492598{col 74}{space 3}-3.145679
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1328{col 27}{space 1}        1{col 39}{result}{space 1}     1327{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}. 
+. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text.Arrpush low U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text.Arrpush high U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.key[2].view.style.editstyle marker(symbol(triangle)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. gr_edit .plotregion1.plot1.style.editstyle area(linestyle(color(red*1.4))) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1.plot3.style.editstyle area(linestyle(color(ebblue*1.2))) editcopy
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic_mo_3.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_3.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_3.gph} saved
+
+{com}. 
+. * Store separate low- and high-dependence models for coefficient extraction.
+. eventdd f_cite_science_num_w whether_pat $controls if moderator == 0, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 121 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    13,071
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}  11255{txt}){col 67}= {res}     40.35
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.6589
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6039
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0315
+{txt}{col 51}Root MSE{col 67}= {res}    1.7249
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .6620565{col 33}{space 2} .0289997{col 44}{space 1}   22.83{col 53}{space 3}0.000{col 61}{space 4} .6052119{col 74}{space 3}  .718901
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2}-.0561953{col 33}{space 2} .0446689{col 44}{space 1}   -1.26{col 53}{space 3}0.208{col 61}{space 4}-.1437542{col 74}{space 3} .0313636
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0669834{col 33}{space 2} .0262753{col 44}{space 1}    2.55{col 53}{space 3}0.011{col 61}{space 4} .0154791{col 74}{space 3} .1184877
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2}  .016345{col 33}{space 2} .0082335{col 44}{space 1}    1.99{col 53}{space 3}0.047{col 61}{space 4} .0002059{col 74}{space 3} .0324841
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-.5101644{col 33}{space 2} .3249096{col 44}{space 1}   -1.57{col 53}{space 3}0.116{col 61}{space 4}-1.147044{col 74}{space 3} .1267152
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.2907803{col 33}{space 2} .1920227{col 44}{space 1}   -1.51{col 53}{space 3}0.130{col 61}{space 4}-.6671783{col 74}{space 3} .0856178
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0014822{col 33}{space 2} .0208657{col 44}{space 1}   -0.07{col 53}{space 3}0.943{col 61}{space 4}-.0423825{col 74}{space 3} .0394182
+{txt}academic_experience {c |}{col 21}{res}{space 2} .8702184{col 33}{space 2} .3916471{col 44}{space 1}    2.22{col 53}{space 3}0.026{col 61}{space 4} .1025217{col 74}{space 3} 1.637915
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-1.065262{col 33}{space 2} .5218177{col 44}{space 1}   -2.04{col 53}{space 3}0.041{col 61}{space 4}-2.088116{col 74}{space 3}-.0424081
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.9676059{col 33}{space 2} .4723585{col 44}{space 1}   -2.05{col 53}{space 3}0.041{col 61}{space 4}-1.893511{col 74}{space 3}-.0417006
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2}-.8159315{col 33}{space 2} .4060271{col 44}{space 1}   -2.01{col 53}{space 3}0.045{col 61}{space 4}-1.611816{col 74}{space 3}-.0200473
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} .8031943{col 33}{space 2} .3890646{col 44}{space 1}    2.06{col 53}{space 3}0.039{col 61}{space 4} .0405598{col 74}{space 3} 1.565829
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 1.721754{col 33}{space 2} .7405976{col 44}{space 1}    2.32{col 53}{space 3}0.020{col 61}{space 4} .2700537{col 74}{space 3} 3.173455
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} .9007068{col 33}{space 2} .7559086{col 44}{space 1}    1.19{col 53}{space 3}0.233{col 61}{space 4}-.5810062{col 74}{space 3}  2.38242
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}  .212543{col 33}{space 2}  .999384{col 44}{space 1}    0.21{col 53}{space 3}0.832{col 61}{space 4}-1.746424{col 74}{space 3}  2.17151
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1790{col 27}{space 1}        1{col 39}{result}{space 1}     1789{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. 
+. eventdd f_cite_science_num_w whether_pat $controls if moderator == 1, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 155 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}     9,721
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   8367{txt}){col 67}= {res}     22.45
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7286
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6847
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0413
+{txt}{col 51}Root MSE{col 67}= {res}    2.3749
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2}   .60478{col 33}{space 2} .0423181{col 44}{space 1}   14.29{col 53}{space 3}0.000{col 61}{space 4}  .521826{col 74}{space 3}  .687734
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2} .1109554{col 33}{space 2}  .074491{col 44}{space 1}    1.49{col 53}{space 3}0.136{col 61}{space 4}-.0350655{col 74}{space 3} .2569763
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .2575173{col 33}{space 2}  .049212{col 44}{space 1}    5.23{col 53}{space 3}0.000{col 61}{space 4} .1610497{col 74}{space 3} .3539849
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0327174{col 33}{space 2} .0123086{col 44}{space 1}    2.66{col 53}{space 3}0.008{col 61}{space 4} .0085896{col 74}{space 3} .0568453
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-1.133328{col 33}{space 2} .4699555{col 44}{space 1}   -2.41{col 53}{space 3}0.016{col 61}{space 4}-2.054557{col 74}{space 3}-.2120988
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.3950024{col 33}{space 2} .2209422{col 44}{space 1}   -1.79{col 53}{space 3}0.074{col 61}{space 4}-.8281039{col 74}{space 3} .0380991
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0420172{col 33}{space 2} .0303791{col 44}{space 1}   -1.38{col 53}{space 3}0.167{col 61}{space 4}-.1015679{col 74}{space 3} .0175334
+{txt}academic_experience {c |}{col 21}{res}{space 2}-.3047316{col 33}{space 2} .5764335{col 44}{space 1}   -0.53{col 53}{space 3}0.597{col 61}{space 4}-1.434684{col 74}{space 3} .8252208
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.7253243{col 33}{space 2} .7456772{col 44}{space 1}   -0.97{col 53}{space 3}0.331{col 61}{space 4}-2.187036{col 74}{space 3} .7363875
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.4709362{col 33}{space 2} .7273598{col 44}{space 1}   -0.65{col 53}{space 3}0.517{col 61}{space 4}-1.896741{col 74}{space 3} .9548691
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} .0373062{col 33}{space 2} .7203229{col 44}{space 1}    0.05{col 53}{space 3}0.959{col 61}{space 4}-1.374705{col 74}{space 3} 1.449317
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2}  1.49067{col 33}{space 2} .7595447{col 44}{space 1}    1.96{col 53}{space 3}0.050{col 61}{space 4} .0017748{col 74}{space 3} 2.979566
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 4.175961{col 33}{space 2}  .906466{col 44}{space 1}    4.61{col 53}{space 3}0.000{col 61}{space 4} 2.399063{col 74}{space 3} 5.952858
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} 6.752728{col 33}{space 2} 1.930215{col 44}{space 1}    3.50{col 53}{space 3}0.000{col 61}{space 4} 2.969029{col 74}{space 3} 10.53643
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}-6.319139{col 33}{space 2} 1.618908{col 44}{space 1}   -3.90{col 53}{space 3}0.000{col 61}{space 4}-9.492598{col 74}{space 3}-3.145679
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1328{col 27}{space 1}        1{col 39}{result}{space 1}     1327{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. * CEM-matched sample.
+. 
+. use ${c -(}stata_output{c )-}DID_listedfirm_mo_cem.dta, clear
+{txt}
+{com}. 
+. global controls firm_size cash RDSpendSumRatio ROA AssetLiabilityRatio TobinQ academic_experience
+{txt}
+{com}. 
+. drop if dif_year!=. & !inrange(dif_year,-3,3)
+{txt}(481 observations deleted)
+
+{com}. keep if cem_matched==1
+{txt}(2,937 observations deleted)
+
+{com}. 
+. eventdd f_cite_science_num_w whether_pat $controls [aweight=cem_weights], over(moderator) jitter(0.2) timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95) ///
+>     graph_op(ytitle("Chinese publicly listed firms""(matched sample)") ///
+>              xtitle("Sanction Year") ///
+>              xscale(range(-3 3)) ///
+>                          yscale(range(-1 1)) ///
+>              graphregion(color(white)) ///
+>              bgcolor(white) ///
+>                          mcolor("ebblue*1.2" "red*1.4") ///
+>              scheme(journal) ///
+>                          legend(order(2 4) rows(2) position(11) ring(0) region(lcolor(none))))                   
+{res}
+
+                    Group 1: moderator=0
+{txt}(dropped 141 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    11,387
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   9622{txt}){col 67}= {res}     11.86
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7327
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6836
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0218
+{txt}{col 51}Root MSE{col 67}= {res}    2.0568
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .7172292{col 33}{space 2} .0604391{col 44}{space 1}   11.87{col 53}{space 3}0.000{col 61}{space 4} .5987558{col 74}{space 3} .8357025
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2}  -.06577{col 33}{space 2} .1025216{col 44}{space 1}   -0.64{col 53}{space 3}0.521{col 61}{space 4}-.2667339{col 74}{space 3} .1351939
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0470368{col 33}{space 2} .0580169{col 44}{space 1}    0.81{col 53}{space 3}0.418{col 61}{space 4}-.0666886{col 74}{space 3} .1607621
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0169053{col 33}{space 2} .0135515{col 44}{space 1}    1.25{col 53}{space 3}0.212{col 61}{space 4}-.0096585{col 74}{space 3} .0434691
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-.6344121{col 33}{space 2} .5861039{col 44}{space 1}   -1.08{col 53}{space 3}0.279{col 61}{space 4}-1.783299{col 74}{space 3}  .514475
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.6204768{col 33}{space 2} .4063348{col 44}{space 1}   -1.53{col 53}{space 3}0.127{col 61}{space 4}-1.416978{col 74}{space 3} .1760249
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0031922{col 33}{space 2} .0501133{col 44}{space 1}   -0.06{col 53}{space 3}0.949{col 61}{space 4}-.1014249{col 74}{space 3} .0950404
+{txt}academic_experience {c |}{col 21}{res}{space 2} .3230274{col 33}{space 2} .7885076{col 44}{space 1}    0.41{col 53}{space 3}0.682{col 61}{space 4}-1.222614{col 74}{space 3} 1.868668
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.9688885{col 33}{space 2} .4652251{col 44}{space 1}   -2.08{col 53}{space 3}0.037{col 61}{space 4}-1.880828{col 74}{space 3}-.0569494
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.9439931{col 33}{space 2} .4533383{col 44}{space 1}   -2.08{col 53}{space 3}0.037{col 61}{space 4}-1.832632{col 74}{space 3}-.0553545
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} -.663419{col 33}{space 2}  .399397{col 44}{space 1}   -1.66{col 53}{space 3}0.097{col 61}{space 4}-1.446321{col 74}{space 3} .1194831
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} .7345608{col 33}{space 2} .3873173{col 44}{space 1}    1.90{col 53}{space 3}0.058{col 61}{space 4}-.0246627{col 74}{space 3} 1.493784
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 1.134752{col 33}{space 2} .5330925{col 44}{space 1}    2.13{col 53}{space 3}0.033{col 61}{space 4} .0897788{col 74}{space 3} 2.179726
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} .3904119{col 33}{space 2} .7078206{col 44}{space 1}    0.55{col 53}{space 3}0.581{col 61}{space 4}-.9970655{col 74}{space 3} 1.777889
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}  1.37498{col 33}{space 2} 2.314087{col 44}{space 1}    0.59{col 53}{space 3}0.552{col 61}{space 4}-3.161118{col 74}{space 3} 5.911078
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1739{col 27}{space 1}        1{col 39}{result}{space 1}     1738{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}
+
+                    Group 2: moderator=1
+{txt}(dropped 171 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}     8,432
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   7123{txt}){col 67}= {res}     17.42
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7608
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.7169
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0521
+{txt}{col 51}Root MSE{col 67}= {res}    2.3876
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .5306437{col 33}{space 2} .0560994{col 44}{space 1}    9.46{col 53}{space 3}0.000{col 61}{space 4} .4206722{col 74}{space 3} .6406152
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2} .2406619{col 33}{space 2} .1141473{col 44}{space 1}    2.11{col 53}{space 3}0.035{col 61}{space 4} .0168992{col 74}{space 3} .4644245
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .2777602{col 33}{space 2} .0964075{col 44}{space 1}    2.88{col 53}{space 3}0.004{col 61}{space 4} .0887728{col 74}{space 3} .4667476
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2}  .116137{col 33}{space 2} .0598118{col 44}{space 1}    1.94{col 53}{space 3}0.052{col 61}{space 4} -.001112{col 74}{space 3}  .233386
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} -1.36819{col 33}{space 2} .6130789{col 44}{space 1}   -2.23{col 53}{space 3}0.026{col 61}{space 4}-2.570007{col 74}{space 3}-.1663737
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.5274272{col 33}{space 2} .3306344{col 44}{space 1}   -1.60{col 53}{space 3}0.111{col 61}{space 4}-1.175569{col 74}{space 3} .1207144
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0965293{col 33}{space 2} .0742886{col 44}{space 1}   -1.30{col 53}{space 3}0.194{col 61}{space 4}-.2421571{col 74}{space 3} .0490985
+{txt}academic_experience {c |}{col 21}{res}{space 2}-1.524132{col 33}{space 2} .9124145{col 44}{space 1}   -1.67{col 53}{space 3}0.095{col 61}{space 4}-3.312735{col 74}{space 3} .2644718
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.0463035{col 33}{space 2} .7549593{col 44}{space 1}   -0.06{col 53}{space 3}0.951{col 61}{space 4}-1.526248{col 74}{space 3} 1.433641
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2} .4024026{col 33}{space 2} .7129117{col 44}{space 1}    0.56{col 53}{space 3}0.572{col 61}{space 4}-.9951161{col 74}{space 3} 1.799921
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} .6423572{col 33}{space 2} .7084913{col 44}{space 1}    0.91{col 53}{space 3}0.365{col 61}{space 4}-.7464962{col 74}{space 3} 2.031211
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} 1.722841{col 33}{space 2} .8135227{col 44}{space 1}    2.12{col 53}{space 3}0.034{col 61}{space 4} .1280953{col 74}{space 3} 3.317587
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 3.955244{col 33}{space 2} .8804607{col 44}{space 1}    4.49{col 53}{space 3}0.000{col 61}{space 4}  2.22928{col 74}{space 3} 5.681209
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} 7.474179{col 33}{space 2} 2.185423{col 44}{space 1}    3.42{col 53}{space 3}0.001{col 61}{space 4} 3.190102{col 74}{space 3} 11.75826
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}-9.498207{col 33}{space 2} 3.046996{col 44}{space 1}   -3.12{col 53}{space 3}0.002{col 61}{space 4}-15.47122{col 74}{space 3} -3.52519
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1283{col 27}{space 1}        1{col 39}{result}{space 1}     1282{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}(note: scheme journal not found, using s2color)
+{res}{txt}
+{com}.                          
+. gr_edit .xaxis1.reset_rule -3 3 1 , tickset(major) ruletype(range)
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(pattern(dash)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].style.editstyle linestyle(width(thin)) editcopy
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[1].text.Arrpush low U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text = {c -(}{c )-}
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.label[2].text.Arrpush high U.S. tech dependence
+{res}{txt}
+{com}. gr_edit .legend.plotregion1.key[2].view.style.editstyle marker(symbol(triangle)) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1._xylines[1].DragBy 0 1
+{res}{txt}
+{com}. gr_edit .plotregion1.plot1.style.editstyle area(linestyle(color(red*1.4))) editcopy
+{res}{txt}
+{com}. gr_edit .plotregion1.plot3.style.editstyle area(linestyle(color(ebblue*1.2))) editcopy
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}dynamic_mo_4.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_4.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/dynamic_mo_4.gph} saved
+
+{com}. 
+. * Store weighted subgroup models for coefficient extraction.
+. eventdd f_cite_science_num_w whether_pat $controls [aweight=cem_weights] if moderator == 0, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 141 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    11,387
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   9622{txt}){col 67}= {res}     11.86
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7327
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6836
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0218
+{txt}{col 51}Root MSE{col 67}= {res}    2.0568
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .7172292{col 33}{space 2} .0604391{col 44}{space 1}   11.87{col 53}{space 3}0.000{col 61}{space 4} .5987558{col 74}{space 3} .8357025
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2}  -.06577{col 33}{space 2} .1025216{col 44}{space 1}   -0.64{col 53}{space 3}0.521{col 61}{space 4}-.2667339{col 74}{space 3} .1351939
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0470368{col 33}{space 2} .0580169{col 44}{space 1}    0.81{col 53}{space 3}0.418{col 61}{space 4}-.0666886{col 74}{space 3} .1607621
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0169053{col 33}{space 2} .0135515{col 44}{space 1}    1.25{col 53}{space 3}0.212{col 61}{space 4}-.0096585{col 74}{space 3} .0434691
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-.6344121{col 33}{space 2} .5861039{col 44}{space 1}   -1.08{col 53}{space 3}0.279{col 61}{space 4}-1.783299{col 74}{space 3}  .514475
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.6204768{col 33}{space 2} .4063348{col 44}{space 1}   -1.53{col 53}{space 3}0.127{col 61}{space 4}-1.416978{col 74}{space 3} .1760249
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0031922{col 33}{space 2} .0501133{col 44}{space 1}   -0.06{col 53}{space 3}0.949{col 61}{space 4}-.1014249{col 74}{space 3} .0950404
+{txt}academic_experience {c |}{col 21}{res}{space 2} .3230274{col 33}{space 2} .7885076{col 44}{space 1}    0.41{col 53}{space 3}0.682{col 61}{space 4}-1.222614{col 74}{space 3} 1.868668
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.9688885{col 33}{space 2} .4652251{col 44}{space 1}   -2.08{col 53}{space 3}0.037{col 61}{space 4}-1.880828{col 74}{space 3}-.0569494
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2}-.9439931{col 33}{space 2} .4533383{col 44}{space 1}   -2.08{col 53}{space 3}0.037{col 61}{space 4}-1.832632{col 74}{space 3}-.0553545
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} -.663419{col 33}{space 2}  .399397{col 44}{space 1}   -1.66{col 53}{space 3}0.097{col 61}{space 4}-1.446321{col 74}{space 3} .1194831
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} .7345608{col 33}{space 2} .3873173{col 44}{space 1}    1.90{col 53}{space 3}0.058{col 61}{space 4}-.0246627{col 74}{space 3} 1.493784
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 1.134752{col 33}{space 2} .5330925{col 44}{space 1}    2.13{col 53}{space 3}0.033{col 61}{space 4} .0897788{col 74}{space 3} 2.179726
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} .3904119{col 33}{space 2} .7078206{col 44}{space 1}    0.55{col 53}{space 3}0.581{col 61}{space 4}-.9970655{col 74}{space 3} 1.777889
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}  1.37498{col 33}{space 2} 2.314087{col 44}{space 1}    0.59{col 53}{space 3}0.552{col 61}{space 4}-3.161118{col 74}{space 3} 5.911078
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1739{col 27}{space 1}        1{col 39}{result}{space 1}     1738{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M7
+{txt}
+{com}. 
+. eventdd f_cite_science_num_w whether_pat $controls [aweight=cem_weights] if moderator == 1, ///
+>     timevar(dif_year) ///
+>     method(hdfe, absorb(year firm_id)) ///
+>     baseline(0) vce(r) level(95)
+{res}{txt}(dropped 171 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}     8,432
+{txt}Absorbing 2 HDFE groups{col 51}F({res}  14{txt},{res}   7123{txt}){col 67}= {res}     17.42
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7608
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.7169
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0521
+{txt}{col 51}Root MSE{col 67}= {res}    2.3876
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}f_cite_science_nu~w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}whether_pat {c |}{col 21}{res}{space 2} .5306437{col 33}{space 2} .0560994{col 44}{space 1}    9.46{col 53}{space 3}0.000{col 61}{space 4} .4206722{col 74}{space 3} .6406152
+{txt}{space 10}firm_size {c |}{col 21}{res}{space 2} .2406619{col 33}{space 2} .1141473{col 44}{space 1}    2.11{col 53}{space 3}0.035{col 61}{space 4} .0168992{col 74}{space 3} .4644245
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .2777602{col 33}{space 2} .0964075{col 44}{space 1}    2.88{col 53}{space 3}0.004{col 61}{space 4} .0887728{col 74}{space 3} .4667476
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2}  .116137{col 33}{space 2} .0598118{col 44}{space 1}    1.94{col 53}{space 3}0.052{col 61}{space 4} -.001112{col 74}{space 3}  .233386
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} -1.36819{col 33}{space 2} .6130789{col 44}{space 1}   -2.23{col 53}{space 3}0.026{col 61}{space 4}-2.570007{col 74}{space 3}-.1663737
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.5274272{col 33}{space 2} .3306344{col 44}{space 1}   -1.60{col 53}{space 3}0.111{col 61}{space 4}-1.175569{col 74}{space 3} .1207144
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0965293{col 33}{space 2} .0742886{col 44}{space 1}   -1.30{col 53}{space 3}0.194{col 61}{space 4}-.2421571{col 74}{space 3} .0490985
+{txt}academic_experience {c |}{col 21}{res}{space 2}-1.524132{col 33}{space 2} .9124145{col 44}{space 1}   -1.67{col 53}{space 3}0.095{col 61}{space 4}-3.312735{col 74}{space 3} .2644718
+{txt}{space 14}lead3 {c |}{col 21}{res}{space 2}-.0463035{col 33}{space 2} .7549593{col 44}{space 1}   -0.06{col 53}{space 3}0.951{col 61}{space 4}-1.526248{col 74}{space 3} 1.433641
+{txt}{space 14}lead2 {c |}{col 21}{res}{space 2} .4024026{col 33}{space 2} .7129117{col 44}{space 1}    0.56{col 53}{space 3}0.572{col 61}{space 4}-.9951161{col 74}{space 3} 1.799921
+{txt}{space 14}lead1 {c |}{col 21}{res}{space 2} .6423572{col 33}{space 2} .7084913{col 44}{space 1}    0.91{col 53}{space 3}0.365{col 61}{space 4}-.7464962{col 74}{space 3} 2.031211
+{txt}{space 15}lag1 {c |}{col 21}{res}{space 2} 1.722841{col 33}{space 2} .8135227{col 44}{space 1}    2.12{col 53}{space 3}0.034{col 61}{space 4} .1280953{col 74}{space 3} 3.317587
+{txt}{space 15}lag2 {c |}{col 21}{res}{space 2} 3.955244{col 33}{space 2} .8804607{col 44}{space 1}    4.49{col 53}{space 3}0.000{col 61}{space 4}  2.22928{col 74}{space 3} 5.681209
+{txt}{space 15}lag3 {c |}{col 21}{res}{space 2} 7.474179{col 33}{space 2} 2.185423{col 44}{space 1}    3.42{col 53}{space 3}0.001{col 61}{space 4} 3.190102{col 74}{space 3} 11.75826
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2}-9.498207{col 33}{space 2} 3.046996{col 44}{space 1}   -3.12{col 53}{space 3}0.002{col 61}{space 4}-15.47122{col 74}{space 3} -3.52519
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}     1283{col 27}{space 1}        1{col 39}{result}{space 1}     1282{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M8
+{txt}
+{com}. 
+. * ==============================================================================
+. * 3. Combine sample-specific moderator graphs and remove temporary files
+. * ==============================================================================
+. 
+. graph combine ${c -(}figure_output{c )-}dynamic_mo_1.gph ${c -(}figure_output{c )-}dynamic_mo_2.gph ///
+> ${c -(}figure_output{c )-}dynamic_mo_3.gph ${c -(}figure_output{c )-}dynamic_mo_4.gph
+{res}{txt}
+{com}. 
+. erase ${c -(}figure_output{c )-}dynamic_mo_1.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic_mo_2.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic_mo_3.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}dynamic_mo_4.gph
+{txt}
+{com}. * ==============================================================================
+. * 4. Assemble subgroup event-study estimates into an analysis dataset
+. * ==============================================================================
+. 
+. local models M1 M2 M3 M4 M5 M6 M7 M8
+{txt}
+{com}. local groups A  A  B  B  C  C  D  D
+{txt}
+{com}. local dep    low high low high low high low high
+{txt}
+{com}. 
+. tempname posth
+{txt}
+{com}. tempfile  out
+{txt}
+{com}. 
+. * Store numeric results as doubles to avoid precision loss.
+. postfile `posth' ///
+>     str1   group ///
+>     str4   dep   ///
+>     double x     ///
+>     double y     ///
+>     double ci_low double ci_high ///
+>     using `out', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_6a8_000001.tmp{rm}
+not found)
+{p_end}
+
+{com}. 
+. * Use the standard-normal critical value for 95% confidence intervals.
+. local z95 = invnormal(0.975)   // 95% CI
+{txt}
+{com}. 
+. local k = 0
+{txt}
+{com}. foreach m of local models {c -(}
+{txt}  2{com}.     local ++k
+{txt}  3{com}.     local g : word `k' of `groups'
+{txt}  4{com}.     local d : word `k' of `dep'
+{txt}  5{com}. 
+.         local z_model = `z95'
+{txt}  6{com}. 
+.     estimates restore `m'
+{txt}  7{com}. 
+.     local names : colnames e(b)
+{txt}  8{com}. 
+.     foreach nm of local names {c -(}
+{txt}  9{com}.         local nm_low = lower("`nm'")
+{txt} 10{com}. 
+.         local matched = 0
+{txt} 11{com}.         local x = .
+{txt} 12{com}. 
+.         * Map leadK coefficients to negative event time.
+.         quietly if regexm("`nm_low'", "lead([0-9]+)") {c -(}
+{txt} 13{com}.             local K = real(regexs(1))
+{txt} 14{com}.             local x = -`K'
+{txt} 15{com}.             local matched = 1
+{txt} 16{com}.         {c )-}
+{txt} 17{com}. 
+.         * Map lagK coefficients to positive event time.
+.         quietly if (`matched'==0) & regexm("`nm_low'", "lag([0-9]+)") {c -(}
+{txt} 18{com}.             local K = real(regexs(1))
+{txt} 19{com}.             local x = `K'
+{txt} 20{com}.             local matched = 1
+{txt} 21{com}.         {c )-}
+{txt} 22{com}. 
+.         if (`matched') {c -(}
+{txt} 23{com}.             capture scalar b  = _b[`nm']
+{txt} 24{com}.             capture scalar se = _se[`nm']
+{txt} 25{com}.             if (_rc == 0) {c -(}
+{txt} 26{com}.                 scalar lo = b - `z_model'*se
+{txt} 27{com}.                 scalar hi = b + `z_model'*se
+{txt} 28{com}.                 post `posth' ("`g'") ("`d'") (`x') (b) (lo) (hi)
+{txt} 29{com}.             {c )-}
+{txt} 30{com}.         {c )-}
+{txt} 31{com}.     {c )-}
+{txt} 32{com}. 
+.     * Add the omitted baseline at event time zero.
+.     post `posth' ("`g'") ("`d'") (0) (0) (0) (0)
+{txt} 33{com}. {c )-}
+{txt}(results {stata estimates replay M1:M1} are active now)
+(results {stata estimates replay M2:M2} are active now)
+(results {stata estimates replay M3:M3} are active now)
+(results {stata estimates replay M4:M4} are active now)
+(results {stata estimates replay M5:M5} are active now)
+(results {stata estimates replay M6:M6} are active now)
+(results {stata estimates replay M7:M7} are active now)
+(results {stata estimates replay M8:M8} are active now)
+
+{com}. 
+. postclose `posth'
+{txt}
+{com}. 
+. use `out', clear
+{txt}
+{com}. order group dep x y ci_low ci_high
+{txt}
+{com}. sort dep group x
+{txt}
+{com}. 
+. save ${c -(}stata_output{c )-}ROS_event_table_mo.dta, replace
+{txt}{p 0 4 2}
+file {bf}
+W:\Mac_Sync\Downloads\ROS\stata_output\CN_CN\ROS_event_table_mo.dta{rm}
+saved
+{p_end}
+
+{com}. * ==============================================================================
+. * 5. Plot event studies by technology-dependence group using two y-axes
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}ROS_event_table_mo.dta, clear
+{txt}
+{com}. 
+. local colA green*1
+{txt}
+{com}. local colB ebblue*1.5
+{txt}
+{com}. local colC purple*1.5
+{txt}
+{com}. local colD red*1.5
+{txt}
+{com}. 
+. local markA circle
+{txt}
+{com}. local markB square
+{txt}
+{com}. local markC triangle
+{txt}
+{com}. local markD diamond
+{txt}
+{com}. 
+. * Low U.S. technology dependence.
+. preserve
+{txt}
+{com}. keep if dep=="low"
+{txt}(28 observations deleted)
+
+{com}. 
+. gen double x_plot = x + ///
+>         cond(group=="A", -0.24, ///
+>         cond(group=="B", -0.08, ///
+>         cond(group=="C",  0.08, ///
+>                           0.24)))   // D
+{txt}
+{com}. 
+. twoway                                                      ///
+>     /* Group A: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="A", lcolor(`colA') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="A", mcolor(`colA') msymbol(`markA') msize(medsmall) yaxis(1)) ///
+>     /* Group B: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="B", lcolor(`colB') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="B", mcolor(`colB') msymbol(`markB') msize(medsmall) yaxis(1)) ///
+>     /* Group C: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="C", lcolor(`colC') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="C", mcolor(`colC') msymbol(`markC') msize(medsmall) yaxis(2)) ///
+>     /* Group D: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="D", lcolor(`colD') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="D", mcolor(`colD') msymbol(`markD') msize(medsmall) yaxis(2)) ///
+>     ,                                                       ///
+>     /* left axis: range and title */                                    ///
+>     yscale(range(-3 3) axis(1))                             ///
+>     ylabel(-3(1)3, labsize(medsmall) axis(1))               ///
+>     ytitle("{c -(}bf: Chinese Firms' Science-Linked Patents{c )-}", axis(1) size(medium)) ///
+>     /* right axis: range and title */      ///
+>     yscale(range(-15 15) axis(2))                             ///
+>     ylabel(-15(5)15, labsize(medsmall) axis(2))               ///
+>     ytitle("{c -(}bf: Chinese Listed Firms' Science-Linked Patents{c )-}", axis(2) size(medsmall) orientation(vertical))                                     ///
+>     /* X */                                              ///
+>     xtitle("{c -(}bf: Sanction Year{c )-}", size(medium)) xlabel(-3(1)3, labsize(medium))     ///
+>     /* legend */                                              ///
+>     legend(order(2 "Chinese firms, full sample (left axis)"             ///
+>                  4 "Chinese firms, matched sample (left axis)"          ///
+>                  6 "Chinese listed firms, full sample (right axis)"      ///
+>                  8 "Chinese listed firms, matched sample (right axis)")  ///
+>            ring(0) pos(11) col(1) size(vsmall) region(margin(zero))) ///
+>     /* reference line */                           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(1))           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(2))           ///
+>     xline(0, lpattern(dash) lcolor(gs11))                   ///
+>     /* layout */                                              ///
+>     aspectratio(0.8) graphregion(margin(vsmall))            ///
+>     title("{c -(}bf: (1) Low U.S. tech dependence{c )-}", size(medsmall))
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}main_dynamic_low.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_low.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_low.gph} saved
+
+{com}. 
+. * Create a legend-free version for use in a combined figure.
+. twoway                                                      ///
+>     /* Group A: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="A", lcolor(`colA') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="A", mcolor(`colA') msymbol(`markA') msize(medsmall) yaxis(1)) ///
+>     /* Group B: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="B", lcolor(`colB') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="B", mcolor(`colB') msymbol(`markB') msize(medsmall) yaxis(1)) ///
+>     /* Group C: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="C", lcolor(`colC') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="C", mcolor(`colC') msymbol(`markC') msize(medsmall) yaxis(2)) ///
+>     /* Group D: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="D", lcolor(`colD') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="D", mcolor(`colD') msymbol(`markD') msize(medsmall) yaxis(2)) ///
+>     ,                                                       ///
+>     /* left axis: range and title */                                    ///
+>     yscale(range(-3 3) axis(1))                             ///
+>     ylabel(-3(1)3, labsize(medsmall) axis(1))               ///
+>     ytitle("{c -(}bf: Chinese Firms' Science-Linked Patents{c )-}", axis(1) size(medium)) ///
+>     /* right axis: range and title */      ///
+>     yscale(range(-15 15) axis(2))                             ///
+>     ylabel(-15(5)15, labsize(medsmall) axis(2))               ///
+>     ytitle("{c -(}bf: Chinese Listed Firms' Science-Linked Patents{c )-}", axis(2) size(medsmall) orientation(vertical))                                     ///
+>     /* X */                                              ///
+>     xtitle("{c -(}bf: Sanction Year{c )-}", size(medium)) xlabel(-3(1)3, labsize(medium))     ///
+>     /* legend */                                              ///
+>     legend(off) ///
+>     /* reference line */                           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(1))           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(2))           ///
+>     xline(0, lpattern(dash) lcolor(gs11))                   ///
+>     /* layout */                                              ///
+>     aspectratio(0.8) graphregion(margin(vsmall))            ///
+>     title("{c -(}bf: (1) Low U.S. tech dependence{c )-}", size(medsmall))
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}main_dynamic_low_legendoff.gph, replace
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_low_legendoff.gph} saved
+
+{com}. 
+. restore
+{txt}
+{com}. * High U.S. technology dependence.
+. preserve
+{txt}
+{com}. keep if dep=="high"
+{txt}(28 observations deleted)
+
+{com}. 
+. gen double x_plot = x + ///
+>         cond(group=="A", -0.24, ///
+>         cond(group=="B", -0.08, ///
+>         cond(group=="C",  0.08, ///
+>                           0.24)))   // D
+{txt}
+{com}. 
+. twoway                                                      ///
+>     /* Group A: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="A", lcolor(`colA') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="A", mcolor(`colA') msymbol(`markA') msize(medsmall) yaxis(1)) ///
+>     /* Group B: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="B", lcolor(`colB') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="B", mcolor(`colB') msymbol(`markB') msize(medsmall) yaxis(1)) ///
+>     /* Group C: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="C", lcolor(`colC') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="C", mcolor(`colC') msymbol(`markC') msize(medsmall) yaxis(2)) ///
+>     /* Group D: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="D", lcolor(`colD') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="D", mcolor(`colD') msymbol(`markD') msize(medsmall) yaxis(2)) ///
+>     ,                                                       ///
+>     /* left axis */                                              ///
+>     yscale(range(-3 3) axis(1))                             ///
+>     ylabel(-3(1)3, labsize(medsmall) axis(1))               ///
+>     ytitle("{c -(}bf: Chinese Firms' Science-Linked Patents{c )-}", axis(1) size(medium)) ///
+>     /* right axis */                                              ///
+>     yscale(range(-15 15) axis(2))                             ///
+>     ylabel(-15(5)15, labsize(medsmall) axis(2))               ///
+>     ytitle("{c -(}bf: Chinese Listed Firms' Science-Linked Patents{c )-}", axis(2) size(medsmall) orientation(vertical))                                     ///
+>     /* X  */                                              ///
+>     xtitle("{c -(}bf: Sanction Year{c )-}", size(medium)) xlabel(-3(1)3, labsize(medium))     ///
+>     /* legend */                                              ///
+>     legend(order(2 "Chinese firms, full sample (left axis)"             ///
+>                  4 "Chinese firms, matched sample (left axis)"          ///
+>                  6 "Chinese listed firms, full sample (right axis)"      ///
+>                  8 "Chinese listed firms, matched sample (right axis)")  ///
+>            ring(0) pos(11) col(1) size(vsmall) region(margin(zero))) ///
+>     /* reference line */                                             ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(1))           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(2))           ///
+>     xline(0, lpattern(dash) lcolor(gs11))                   ///
+>     aspectratio(0.8) graphregion(margin(vsmall))            ///
+>     title("{c -(}bf: (2) High U.S. tech dependence{c )-}", size(medsmall))
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}main_dynamic_high.gph, replace
+{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_high.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_high.gph} saved
+
+{com}. 
+. * Create a legend-free version for use in a combined figure.
+. twoway                                                      ///
+>     /* Group A: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="A", lcolor(`colA') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="A", mcolor(`colA') msymbol(`markA') msize(medsmall) yaxis(1)) ///
+>     /* Group B: left axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="B", lcolor(`colB') lwidth(thick) yaxis(1)) ///
+>     (scatter y x_plot if group=="B", mcolor(`colB') msymbol(`markB') msize(medsmall) yaxis(1)) ///
+>     /* Group C: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="C", lcolor(`colC') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="C", mcolor(`colC') msymbol(`markC') msize(medsmall) yaxis(2)) ///
+>     /* Group D: right axis */                                     ///
+>     (rcap  ci_low ci_high x_plot if group=="D", lcolor(`colD') lwidth(thick) yaxis(2)) ///
+>     (scatter y x_plot if group=="D", mcolor(`colD') msymbol(`markD') msize(medsmall) yaxis(2)) ///
+>     ,                                                       ///
+>     /* left axis */                                              ///
+>     yscale(range(-3 3) axis(1))                             ///
+>     ylabel(-3(1)3, labsize(medsmall) axis(1))               ///
+>     ytitle("{c -(}bf: Chinese Firms' Science-Linked Patents{c )-}", axis(1) size(medium)) ///
+>     /* right axis */                                              ///
+>     yscale(range(-15 15) axis(2))                             ///
+>     ylabel(-15(5)15, labsize(medsmall) axis(2))               ///
+>     ytitle("{c -(}bf: Chinese Listed Firms' Science-Linked Patents{c )-}", axis(2) size(medsmall) orientation(vertical))                                     ///
+>     /* X  */                                              ///
+>     xtitle("{c -(}bf: Sanction Year{c )-}", size(medium)) xlabel(-3(1)3, labsize(medium))     ///
+>     /* legend */                                              ///
+>     legend(off) ///
+>     /* reference line */                                             ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(1))           ///
+>     yline(0, lpattern(dash) lcolor(gs11) axis(2))           ///
+>     xline(0, lpattern(dash) lcolor(gs11))                   ///
+>     aspectratio(0.8) graphregion(margin(vsmall))            ///
+>     title("{c -(}bf: (2) High U.S. tech dependence{c )-}", size(medsmall))
+{res}{txt}
+{com}. 
+. graph save ${c -(}figure_output{c )-}main_dynamic_high_legendoff.gph, replace
+{res}{txt}file {bf:W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../figure_output/CN_CN/main_dynamic_high_legendoff.gph} saved
+
+{com}. 
+. restore
+{txt}
+{com}. * ==============================================================================
+. * 6. Clean temporary graphs
+. * ==============================================================================
+. 
+. * Remove the temporary versions that include legends.
+. erase ${c -(}figure_output{c )-}main_dynamic_low.gph
+{txt}
+{com}. erase ${c -(}figure_output{c )-}main_dynamic_high.gph
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_dynamic_mo.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 14:02:03
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
