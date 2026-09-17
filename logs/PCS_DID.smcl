@@ -1,0 +1,855 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 12:14:10
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\1_Chinese_firms\01_DID_panel.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—Chinese-firm analysis
+> Script:  01_DID_panel.do
+> 
+> Purpose:
+>   Produce sample summaries, pre-treatment means, baseline difference-in-
+>   differences (DID) estimates, and coarsened-exact-matching (CEM) balance
+>   diagnostics for the Chinese-firm panel.
+> 
+> Main inputs:
+>   - ${c -(}stata_output{c )-}DID_allfirm-level.dta (full firm-year panel)
+>   - ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta (CEM panel and weights)
+> 
+> Main outputs:
+>   - ${c -(}table_output{c )-}main_summary_stats.doc
+>   - ${c -(}table_output{c )-}main_did.rtf
+>   - ${c -(}table_output{c )-}main_cem_balance.doc
+> 
+> Required setup:
+>   The master runner defines stata_output and table_output before calling this
+>   file. The script also requires the community-contributed commands asdoc,
+>   reghdfe, ppmlhdfe, and esttab.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Produce descriptive statistics and sample counts
+. * ==============================================================================
+. 
+. * Load the full firm-year analysis panel.
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Define outcomes, treatment measures, and baseline firm characteristics.
+. global summary_statistics ///
+>     f_cite_science_num f_cite_cn_sci_num f_cite_foreign_sci_num f_cite_us_sci_num f_cite_nonus_foreign_sci_num /// Outcomes
+>     did whether_pat /// Treatment and patent-activity indicators
+>     state_owned before_patent before_sci_patent // Baseline characteristics
+{txt}
+{com}. 
+. * Create the summary-statistics document; subsequent panels append to this file.
+. asdoc tabstat $summary_statistics, ///
+>     save(${c -(}table_output{c )-}main_summary_stats.doc) replace ///
+>     stat(N mean sd min max)
+{res}
+{txt}{space 0}{space 0}{ralign 12:}{space 1}{c |}{space 1}{ralign 9:N}{space 1}{space 1}{ralign 9:Mean}{space 1}{space 1}{ralign 9:SD}{space 1}{space 1}{ralign 9:Min}{space 1}{space 1}{ralign 9:Max}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}{hline 11}{hline 11}{hline 11}{hline 10}
+{space 0}{space 0}{ralign 12:f_cite_sci~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .1389001}}}{space 1}{space 1}{ralign 9:{res:{sf: 3.322205}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:     1399}}}{space 1}
+{space 0}{space 0}{ralign 12:f_cite_cn_~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .1312799}}}{space 1}{space 1}{ralign 9:{res:{sf:  3.13431}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:     1345}}}{space 1}
+{space 0}{space 0}{ralign 12:f_cite_for~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .0297476}}}{space 1}{space 1}{ralign 9:{res:{sf: .9167207}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      506}}}{space 1}
+{space 0}{space 0}{ralign 12:f_cite_us_~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .0088751}}}{space 1}{space 1}{ralign 9:{res:{sf: .2847628}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      166}}}{space 1}
+{space 0}{space 0}{ralign 12:f_cite_non~m}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .0229345}}}{space 1}{space 1}{ralign 9:{res:{sf: .7081611}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:      381}}}{space 1}
+{space 0}{space 0}{ralign 12:did}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .0001365}}}{space 1}{space 1}{ralign 9:{res:{sf: .0116833}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        1}}}{space 1}
+{space 0}{space 0}{ralign 12:whether_pat}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .2382704}}}{space 1}{space 1}{ralign 9:{res:{sf: .4260254}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        1}}}{space 1}
+{space 0}{space 0}{ralign 12:state_owned}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .0489319}}}{space 1}{space 1}{ralign 9:{res:{sf: .2157258}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf:        1}}}{space 1}
+{space 0}{space 0}{ralign 12:before_pat~t}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .8279633}}}{space 1}{space 1}{ralign 9:{res:{sf: 12.23496}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf: 2764.222}}}{space 1}
+{space 0}{space 0}{ralign 12:before_sci~t}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  2739581}}}{space 1}{space 1}{ralign 9:{res:{sf: .1362146}}}{space 1}{space 1}{ralign 9:{res:{sf:  2.31392}}}{space 1}{space 1}{ralign 9:{res:{sf:        0}}}{space 1}{space 1}{ralign 9:{res:{sf: 725.2308}}}{space 1}
+{res}{txt}{p 0 4 2}
+(file {bf}
+W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc{rm}
+not found)
+{p_end}
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc"}
+
+{com}. 
+. * Append the correlation matrix.
+. asdoc cor $summary_statistics, ///
+>     save(${c -(}table_output{c )-}main_summary_stats.doc) append
+{txt}(obs=2,739,581)
+
+             {c |} f_~e_num f_cite.. f_cite.. f_cite.. f_cite..      did whethe~t state_~d before.. b~sci_~t
+{hline 13}{c +}{hline 90}
+f_cite_sci~m {c |}{res}   1.0000
+{txt}f_cite_cn_~m {c |}{res}   0.9985   1.0000
+{txt}f_cite_for~m {c |}{res}   0.8982   0.8792   1.0000
+{txt}f_cite_us_~m {c |}{res}   0.8285   0.8097   0.9420   1.0000
+{txt}f_cite_non~m {c |}{res}   0.8957   0.8771   0.9929   0.9013   1.0000
+         {txt}did {c |}{res}   0.0751   0.0721   0.0947   0.0952   0.0924   1.0000
+ {txt}whether_pat {c |}{res}   0.0748   0.0749   0.0580   0.0557   0.0579   0.0183   1.0000
+ {txt}state_owned {c |}{res}   0.0460   0.0473   0.0248   0.0209   0.0251   0.0211   0.0721   1.0000
+{txt}before_pat~t {c |}{res}   0.6511   0.6545   0.5520   0.5321   0.5415   0.0317   0.0559   0.0527   1.0000
+{txt}before_sci~t {c |}{res}   0.7368   0.7483   0.5787   0.5305   0.5781   0.0209   0.0512   0.0649   0.8410   1.0000
+
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc"}
+{txt}
+{com}. 
+. * Append treatment-group counts at the firm-year level.
+. tab entity_list
+
+{txt}entity_list {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}  2,736,429       99.88       99.88
+{txt}          1 {c |}{res}      3,152        0.12      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}  2,739,581      100.00
+{txt}
+{com}. asdoc tab entity_list, ///
+>     save(${c -(}table_output{c )-}main_summary_stats.doc) append ///
+>     title(Firm-year level)
+
+{txt}entity_list {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}  2,736,429       99.88       99.88
+{txt}          1 {c |}{res}      3,152        0.12      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}  2,739,581      100.00
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc"}
+{txt}
+{com}. 
+. * Reduce to one observation per firm and append firm-level treatment counts.
+. keep firm_id entity_list
+{txt}
+{com}. duplicates drop
+
+{p 0 4}{txt}Duplicates in terms of {txt} all variables{p_end}
+
+(2,395,778 observations deleted)
+
+{com}. tab entity_list
+
+{txt}entity_list {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}    343,510       99.91       99.91
+{txt}          1 {c |}{res}        293        0.09      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    343,803      100.00
+{txt}
+{com}. asdoc tab entity_list, ///
+>     save(${c -(}table_output{c )-}main_summary_stats.doc) append ///
+>     title(Firm level)
+
+{txt}entity_list {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}    343,510       99.91       99.91
+{txt}          1 {c |}{res}        293        0.09      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    343,803      100.00
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc"}
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Calculate pre-treatment means for treated firms
+. * ==============================================================================
+. 
+. * Calculate the full-sample mean before each treated firm's listing year.
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. keep if entity_list==1 & year<list_year
+{txt}(2,737,020 observations deleted)
+
+{com}. quietly summarize f_cite_science_num_w
+{txt}
+{com}. scalar m_base = r(mean)
+{txt}
+{com}. 
+. * Calculate the corresponding mean among CEM-matched treated observations.
+. use ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta, clear
+{txt}
+{com}. keep if cem_matched==1
+{txt}(2,028,164 observations deleted)
+
+{com}. keep if entity_list==1 & year<list_year
+{txt}(709,464 observations deleted)
+
+{com}. quietly summarize f_cite_science_num_w
+{txt}
+{com}. scalar m_cem = r(mean)
+{txt}
+{com}. 
+. * Build a two-row reporting dataset containing the stored means.
+. clear
+{txt}
+{com}. input str64 group double mean_f_cite_science_num_w
+
+     {txt}                                                           group  mean_f_c~w
+  1{com}. "pre-treatment mean (all sample)" .
+{txt}  2{com}. "pre-treatment mean (after CEM)"      .
+{txt}  3{com}. end
+{txt}
+{com}. replace mean_f_cite_science_num_w = m_base in 1
+{txt}(1 real change made)
+
+{com}. replace mean_f_cite_science_num_w = m_cem in 2
+{txt}(1 real change made)
+
+{com}. 
+. * Print a diagnostic path; the asdoc command below appends to main_summary_stats.doc.
+. di as txt "Writing to: " "${c -(}table_output{c )-}summary_stats_main.doc"
+{res}{txt}Writing to: W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/summary_stats_main.doc
+
+{com}. 
+. asdoc list group mean_f_cite_science_num_w, ///
+>     save(${c -(}table_output{c )-}main_summary_stats.doc) append ///
+>     title(Pre-treatment means of f_cite_science_num_w) ///
+>     dec(3)
+{res}{txt}
+     {c TLC}{hline 33}{c -}{hline 11}{c TRC}
+     {c |} {res}                          group   mean_f_~w {txt}{c |}
+     {c LT}{hline 33}{c -}{hline 11}{c RT}
+  1. {c |} {res}pre-treatment mean (all sample)   .79734479 {txt}{c |}
+  2. {c |} {res} pre-treatment mean (after CEM)   .46594982 {txt}{c |}
+     {c BLC}{hline 33}{c -}{hline 11}{c BRC}
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_summary_stats.doc"}
+
+{com}. 
+. * ==============================================================================
+. * 3. Estimate baseline DID models for the full sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Model 1: linear specification for winsorized science-linked patent counts.
+. reghdfe f_cite_science_num_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  56492.66
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4312
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3495
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0698
+{txt}{col 51}Root MSE{col 67}= {res}    0.3474
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} 1.008053{col 26}{space 2}  .072797{col 37}{space 1}   13.85{col 46}{space 3}0.000{col 54}{space 4} .8653736{col 67}{space 3} 1.150733
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .2647401{col 26}{space 2} .0007885{col 37}{space 1}  335.77{col 46}{space 3}0.000{col 54}{space 4} .2631948{col 67}{space 3} .2662855
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0265679{col 26}{space 2} .0001961{col 37}{space 1}  135.49{col 46}{space 3}0.000{col 54}{space 4} .0261836{col 67}{space 3} .0269522
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: linear specification for log-transformed counts.
+. reghdfe ln_f_cite_science_num did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  64662.46
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4594
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3818
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0838
+{txt}{col 51}Root MSE{col 67}= {res}    0.1958
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_c~e_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2}  .827401{col 26}{space 2} .0535039{col 37}{space 1}   15.46{col 46}{space 3}0.000{col 54}{space 4} .7225353{col 67}{space 3} .9322667
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .1638897{col 26}{space 2} .0004564{col 37}{space 1}  359.11{col 46}{space 3}0.000{col 54}{space 4} .1629952{col 67}{space 3} .1647842
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0149494{col 26}{space 2} .0001116{col 37}{space 1}  133.90{col 46}{space 3}0.000{col 54}{space 4} .0147306{col 67}{space 3} .0151682
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: Poisson specification for counts.
+. ppmlhdfe f_cite_science_num did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 1923247 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 536466 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 33732 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.7121e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}6{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.69  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}3.0813e+05 {col 39}{txt}eps = {res}2.05e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.64  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}3.0376e+05 {col 39}{txt}eps = {res}1.44e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.30  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}3.0368e+05 {col 39}{txt}eps = {res}2.44e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.53  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}3.0368e+05 {col 39}{txt}eps = {res}3.07e-07 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.55  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}3.0368e+05 {col 39}{txt}eps = {res}2.67e-12 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.55  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}3.0368e+05 {col 39}{txt}eps = {res}1.46e-16 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res} -5.55  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}3.0368e+05 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.55  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 28 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}   246,136
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}   183,966
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     21.28
+{txt}Deviance{col 22}={col 24}{res} 303682.3918{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0000
+{txt}Log pseudolikelihood ={col 24}{res}-301144.0056{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.6088
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .5073578{col 26}{space 2} .1099785{col 37}{space 1}    4.61{col 46}{space 3}0.000{col 54}{space 4} .2918039{col 67}{space 3} .7229117
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 1.689747{col 26}{space 2} .0079318{col 37}{space 1}  213.03{col 46}{space 3}0.000{col 54}{space 4} 1.674201{col 67}{space 3} 1.705293
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    62157{col 27}{space 1}        0{col 39}{result}{space 1}    62157{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * ==============================================================================
+. * 4. Estimate baseline DID models for the CEM sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta, clear
+{txt}
+{com}. 
+. keep if cem_matched==1
+{txt}(2,028,164 observations deleted)
+
+{com}. 
+. * Model 4: CEM-weighted linear specification for winsorized counts.
+. reghdfe f_cite_science_num_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}    195.49
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5171
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4492
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0779
+{txt}{col 51}Root MSE{col 67}= {res}    0.7948
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3368713{col 26}{space 2} .0909419{col 37}{space 1}    3.70{col 46}{space 3}0.000{col 54}{space 4} .1586281{col 67}{space 3} .5151145
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .6278741{col 26}{space 2} .0319186{col 37}{space 1}   19.67{col 46}{space 3}0.000{col 54}{space 4} .5653147{col 67}{space 3} .6904334
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1949334{col 26}{space 2} .0154119{col 37}{space 1}   12.65{col 46}{space 3}0.000{col 54}{space 4} .1647266{col 67}{space 3} .2251401
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. 
+. * Model 5: CEM-weighted linear specification for log-transformed counts.
+. reghdfe ln_f_cite_science_num did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}    242.94
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5328
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4671
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0877
+{txt}{col 51}Root MSE{col 67}= {res}    0.4279
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_c~e_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3358387{col 26}{space 2} .0624996{col 37}{space 1}    5.37{col 46}{space 3}0.000{col 54}{space 4} .2133416{col 67}{space 3} .4583359
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .3603565{col 26}{space 2} .0167844{col 37}{space 1}   21.47{col 46}{space 3}0.000{col 54}{space 4} .3274597{col 67}{space 3} .3932533
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1035783{col 26}{space 2} .0086773{col 37}{space 1}   11.94{col 46}{space 3}0.000{col 54}{space 4} .0865712{col 67}{space 3} .1205855
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. 
+. * Model 6: CEM-weighted Poisson specification for counts.
+. ppmlhdfe f_cite_science_num did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r)
+{res}{txt}(dropped 532356 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 134871 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 10054 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.9685e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -1.94  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}3.5402e+05 {col 39}{txt}eps = {res}1.21e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -2.93  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}3.5168e+05 {col 39}{txt}eps = {res}6.65e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.72  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}3.5160e+05 {col 39}{txt}eps = {res}2.24e-04 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.12  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}3.5160e+05 {col 39}{txt}eps = {res}2.40e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.22  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}3.5160e+05 {col 39}{txt}eps = {res}1.05e-09 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -4.22  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}3.5160e+05 {col 39}{txt}eps = {res}1.10e-15 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -4.22  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}3.5160e+05 {col 39}{txt}eps = {res}1.22e-16 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -4.22  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 24 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    34,136
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    23,352
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     11.23
+{txt}Deviance{col 22}={col 24}{res} 351601.3271{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0008
+{txt}Log pseudolikelihood ={col 24}{res}-363994.8612{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.5245
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4397741{col 26}{space 2} .1312332{col 37}{space 1}    3.35{col 46}{space 3}0.001{col 54}{space 4} .1825619{col 67}{space 3} .6969864
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 1.624816{col 26}{space 2} .0307898{col 37}{space 1}   52.77{col 46}{space 3}0.000{col 54}{space 4} 1.564469{col 67}{space 3} 1.685163
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    10771{col 27}{space 1}        0{col 39}{result}{space 1}    10771{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. 
+. * Export full-sample and matched-sample estimates in one table.
+. esttab M1 M2 M3 M4 M5 M6 using ${c -(}table_output{c )-}main_did.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4" "Model 5" "Model 6") ///
+>         nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_did.rtf"'})
+
+{com}. 
+. * ==============================================================================
+. * 5. Assess covariate balance before and after matching
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta, clear
+{txt}
+{com}. 
+. * Compare unweighted covariate means before matching.
+. mean log_before_patent log_before_sci_patent state_owned industry_id province, over(entity_list)
+{res}
+{txt}{col 1}Mean estimation{col 61}{lalign 13:Number of obs}{col 74} = {res}{ralign 9:2,739,581}
+
+{txt}{hline 36}{c TT}{hline 11}{hline 11}{hline 14}{hline 12}
+{col 37}{c |}       Mean{col 49}   Std. err.{col 61}     [95% con{col 74}f. interval]
+{hline 36}{c +}{hline 11}{hline 11}{hline 14}{hline 12}
+{space 4}c.log_before_patent@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .3526035{col 49}{space 2} .0002538{col 60}{space 5} .3521059{col 74}{space 3}  .353101
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} 1.432965{col 49}{space 2} .0231467{col 60}{space 5} 1.387599{col 74}{space 3} 1.478332
+{txt}{space 35} {c |}
+c.log_before_sci_patent@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .0754988{col 49}{space 2} .0001255{col 60}{space 5} .0752528{col 74}{space 3} .0757449
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} .6501106{col 49}{space 2} .0146877{col 60}{space 5} .6213232{col 74}{space 3} .6788981
+{txt}{space 35} {c |}
+{space 10}c.state_owned@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .0484928{col 49}{space 2} .0001299{col 60}{space 5} .0482383{col 74}{space 3} .0487473
+{txt}{space 33}1  {c |}{col 37}{res}{space 2}  .430203{col 49}{space 2} .0088201{col 60}{space 5}  .412916{col 74}{space 3} .4474901
+{txt}{space 35} {c |}
+{space 10}c.industry_id@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} 311.2957{col 49}{space 2}  .113813{col 60}{space 5} 311.0726{col 74}{space 3} 311.5187
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} 449.2747{col 49}{space 2}  2.89614{col 60}{space 5} 443.5984{col 74}{space 3} 454.9511
+{txt}{space 35} {c |}
+{space 13}c.province@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} 36.01387{col 49}{space 2} .0076905{col 60}{space 5}  35.9988{col 74}{space 3} 36.02895
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} 34.69924{col 49}{space 2} .2908673{col 60}{space 5} 34.12915{col 74}{space 3} 35.26933
+{txt}{hline 36}{c BT}{hline 11}{hline 11}{hline 14}{hline 12}
+
+{com}. 
+. * Compare CEM-weighted covariate means after matching.
+. mean log_before_patent log_before_sci_patent state_owned industry_id province [pweight=cem_weights], over(entity_list)
+{res}
+{txt}{col 1}Mean estimation{col 63}{lalign 13:Number of obs}{col 76} = {res}{ralign 7:711,417}
+
+{txt}{hline 36}{c TT}{hline 11}{hline 11}{hline 14}{hline 12}
+{col 37}{c |}       Mean{col 49}   Std. err.{col 61}     [95% con{col 74}f. interval]
+{hline 36}{c +}{hline 11}{hline 11}{hline 14}{hline 12}
+{space 4}c.log_before_patent@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .9765326{col 49}{space 2} .0132651{col 60}{space 5} .9505333{col 74}{space 3} 1.002532
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} .9800224{col 49}{space 2}  .018686{col 60}{space 5} .9433985{col 74}{space 3} 1.016646
+{txt}{space 35} {c |}
+c.log_before_sci_patent@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .3745589{col 49}{space 2} .0085734{col 60}{space 5} .3577553{col 74}{space 3} .3913625
+{txt}{space 33}1  {c |}{col 37}{res}{space 2}  .384368{col 49}{space 2} .0107393{col 60}{space 5} .3633193{col 74}{space 3} .4054167
+{txt}{space 35} {c |}
+{space 10}c.state_owned@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} .3480986{col 49}{space 2} .0056203{col 60}{space 5}  .337083{col 74}{space 3} .3591143
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} .3480986{col 49}{space 2}  .009738{col 60}{space 5} .3290124{col 74}{space 3} .3671848
+{txt}{space 35} {c |}
+{space 10}c.industry_id@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} 447.0897{col 49}{space 2} 1.429655{col 60}{space 5} 444.2876{col 74}{space 3} 449.8918
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} 446.2566{col 49}{space 2} 3.310336{col 60}{space 5} 439.7684{col 74}{space 3} 452.7447
+{txt}{space 35} {c |}
+{space 13}c.province@entity_list {c |}
+{space 33}0  {c |}{col 37}{res}{space 2} 34.55214{col 49}{space 2} .1628079{col 60}{space 5} 34.23305{col 74}{space 3} 34.87124
+{txt}{space 33}1  {c |}{col 37}{res}{space 2} 34.43335{col 49}{space 2} .3448871{col 60}{space 5} 33.75738{col 74}{space 3} 35.10931
+{txt}{hline 36}{c BT}{hline 11}{hline 11}{hline 14}{hline 12}
+
+{com}. 
+. * Test CEM-weighted differences between treated and control observations.
+. regress before_patent entity_list [pweight=cem_weights], robust // Patent-history balance.
+{txt}(sum of wgt is 711,416.999997893)
+
+Linear regression                               Number of obs     = {res}   711,417
+                                                {txt}F(1, 711415)      =  {res}     0.23
+                                                {txt}Prob > F          = {res}    0.6298
+                                                {txt}R-squared         = {res}    0.0000
+                                                {txt}Root MSE          =    {res} 6.0907
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}before_pat~t{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}entity_list {c |}{col 14}{res}{space 2} .0806626{col 26}{space 2} .1673499{col 37}{space 1}    0.48{col 46}{space 3}0.630{col 54}{space 4}-.2473376{col 67}{space 3} .4086629
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 3.406186{col 26}{space 2} .1055236{col 37}{space 1}   32.28{col 46}{space 3}0.000{col 54}{space 4} 3.199364{col 67}{space 3} 3.613009
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. regress before_sci_patent entity_list [pweight=cem_weights], robust // Science-history balance.
+{txt}(sum of wgt is 711,416.999997893)
+
+Linear regression                               Number of obs     = {res}   711,417
+                                                {txt}F(1, 711415)      =  {res}     0.31
+                                                {txt}Prob > F          = {res}    0.5785
+                                                {txt}R-squared         = {res}    0.0000
+                                                {txt}Root MSE          =    {res} 1.6378
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}before_sci~t{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}entity_list {c |}{col 14}{res}{space 2} .0254924{col 26}{space 2}  .045888{col 37}{space 1}    0.56{col 46}{space 3}0.579{col 54}{space 4}-.0644466{col 67}{space 3} .1154314
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .7552371{col 26}{space 2} .0289863{col 37}{space 1}   26.05{col 46}{space 3}0.000{col 54}{space 4} .6984248{col 67}{space 3} .8120494
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. regress state_owned entity_list [pweight=cem_weights], robust // Ownership balance.
+{txt}(sum of wgt is 711,416.999997893)
+
+Linear regression                               Number of obs     = {res}   711,417
+                                                {txt}F(1, 711415)      =  {res}     0.00
+                                                {txt}Prob > F          = {res}    1.0000
+                                                {txt}R-squared         = {res}    0.0000
+                                                {txt}Root MSE          =    {res} .47637
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1} state_owned{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}entity_list {c |}{col 14}{res}{space 2} 1.98e-15{col 26}{space 2} .0112436{col 37}{space 1}    0.00{col 46}{space 3}1.000{col 54}{space 4} -.022037{col 67}{space 3}  .022037
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .3480986{col 26}{space 2} .0056203{col 37}{space 1}   61.94{col 46}{space 3}0.000{col 54}{space 4}  .337083{col 67}{space 3} .3591143
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. regress industry_id entity_list [pweight=cem_weights], robust // Industry balance.
+{txt}(sum of wgt is 711,416.999997893)
+
+Linear regression                               Number of obs     = {res}   711,417
+                                                {txt}F(1, 711415)      =  {res}     0.05
+                                                {txt}Prob > F          = {res}    0.8173
+                                                {txt}R-squared         = {res}    0.0000
+                                                {txt}Root MSE          =    {res} 161.97
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1} industry_id{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}entity_list {c |}{col 14}{res}{space 2} -.833123{col 26}{space 2} 3.605864{col 37}{space 1}   -0.23{col 46}{space 3}0.817{col 54}{space 4}-7.900498{col 67}{space 3} 6.234252
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 447.0897{col 26}{space 2} 1.429656{col 37}{space 1}  312.73{col 46}{space 3}0.000{col 54}{space 4} 444.2876{col 67}{space 3} 449.8918
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. regress province entity_list [pweight=cem_weights], robust // Province balance.
+{txt}(sum of wgt is 711,416.999997893)
+
+Linear regression                               Number of obs     = {res}   711,417
+                                                {txt}F(1, 711415)      =  {res}     0.10
+                                                {txt}Prob > F          = {res}    0.7554
+                                                {txt}R-squared         = {res}    0.0000
+                                                {txt}Root MSE          =    {res} 16.915
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}    province{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}entity_list {c |}{col 14}{res}{space 2}-.1187971{col 26}{space 2}  .381384{col 37}{space 1}   -0.31{col 46}{space 3}0.755{col 54}{space 4}-.8662972{col 67}{space 3}  .628703
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 34.55214{col 26}{space 2}  .162808{col 37}{space 1}  212.23{col 46}{space 3}0.000{col 54}{space 4} 34.23305{col 67}{space 3} 34.87124
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. * ==============================================================================
+. * 6. Construct and export the detailed CEM balance table
+. * ==============================================================================
+. 
+. clear all
+{res}{txt}
+{com}. set more off
+{txt}
+{com}. 
+. * Use the same CEM panel to calculate unweighted and weighted statistics.
+. local prefile  "${c -(}stata_output{c )-}DID_allfirm-level_cem.dta"
+{txt}
+{com}. local postfile "${c -(}stata_output{c )-}DID_allfirm-level_cem.dta"
+{txt}
+{com}. 
+. * Define the covariates and their reporting order.
+. local vars log_before_patent log_before_sci_patent state_owned industry_id province
+{txt}
+{com}. 
+. * Assign one display label to each covariate in the same order.
+. local label1 "Log (number of patents filed before listing+1)"
+{txt}
+{com}. local label2 "Log (Prior scientific foundations+1)"
+{txt}
+{com}. local label3 "Firm ownership (SOEs=1, non-SOEs=0)"
+{txt}
+{com}. local label4 "Industry id"
+{txt}
+{com}. local label5 "Province id"
+{txt}
+{com}. 
+. * Define a reusable helper for posting two-group mean statistics.
+. capture program drop _post_mean_two_groups
+{txt}
+{com}. program define _post_mean_two_groups, rclass
+{txt}  1{com}.     syntax, Varname(name) Varlab(string) Handle(name) Stage(string)
+{txt}  2{com}.     tempname T
+{txt}  3{com}.     matrix `T' = r(table)
+{txt}  4{com}.     // Post statistics for control observations (entity_list==0).
+.     post ``Handle'' ("`Varlab'") ("Control") ///
+>         ( `T'[1,1] ) ( `T'[2,1] ) ( `T'[5,1] ) ( `T'[6,1] ) ("`Stage'")
+{txt}  5{com}.     // Post statistics for treated observations (entity_list==1).
+.     post ``Handle'' ("`Varlab'") ("Treatment") ///
+>         ( `T'[1,2] ) ( `T'[2,2] ) ( `T'[5,2] ) ( `T'[6,2] ) ("`Stage'")
+{txt}  6{com}. end
+{txt}
+{com}. 
+. * Calculate unweighted pre-matching means and confidence intervals by group.
+. use `prefile', clear
+{txt}
+{com}. 
+. tempname preh
+{txt}
+{com}. tempfile pretmp
+{txt}
+{com}. postfile `preh' str80 Variable str10 Group ///
+>     double pre_mean pre_se pre_ll pre_ul ///
+>     using `pretmp', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000001.tmp{rm}
+not found)
+{p_end}
+
+{com}. 
+. local i = 0
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local ++i
+{txt}  3{com}.     local vlab `label`i''        // Map each covariate to its display label.
+{txt}  4{com}.     quietly mean `v', over(entity_list)
+{txt}  5{com}.     tempname T
+{txt}  6{com}.     matrix `T' = r(table)
+{txt}  7{com}.     // Post control-group statistics.
+.     post `preh' ("`vlab'") ("Control") ///
+>         (`T'[1,1]) (`T'[2,1]) (`T'[5,1]) (`T'[6,1])
+{txt}  8{com}.     // Post treatment-group statistics.
+.     post `preh' ("`vlab'") ("Treatment") ///
+>         (`T'[1,2]) (`T'[2,2]) (`T'[5,2]) (`T'[6,2])
+{txt}  9{com}. {c )-}
+{txt}
+{com}. postclose `preh'
+{txt}
+{com}. 
+. use `pretmp', clear
+{txt}
+{com}. tempfile predata
+{txt}
+{com}. save `predata', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000002.tmp{rm}
+not found)
+{p_end}
+{p 0 4 2}
+file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000002.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. * Calculate CEM-weighted post-matching statistics by group.
+. use `postfile', clear
+{txt}
+{com}. 
+. tempname posth
+{txt}
+{com}. tempfile posttmp
+{txt}
+{com}. postfile `posth' str80 Variable str10 Group ///
+>     double post_mean post_se post_ll post_ul ///
+>     using `posttmp', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000003.tmp{rm}
+not found)
+{p_end}
+
+{com}. 
+. local i = 0
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local ++i
+{txt}  3{com}.     local vlab `label`i''        // Map each covariate to its display label.
+{txt}  4{com}.     quietly mean `v' [pweight=cem_weights], over(entity_list)
+{txt}  5{com}.     tempname T
+{txt}  6{com}.     matrix `T' = r(table)
+{txt}  7{com}.     // Post control-group statistics.
+.     post `posth' ("`vlab'") ("Control") ///
+>         (`T'[1,1]) (`T'[2,1]) (`T'[5,1]) (`T'[6,1])
+{txt}  8{com}.     // Post treatment-group statistics.
+.     post `posth' ("`vlab'") ("Treatment") ///
+>         (`T'[1,2]) (`T'[2,2]) (`T'[5,2]) (`T'[6,2])
+{txt}  9{com}. {c )-}
+{txt}
+{com}. postclose `posth'
+{txt}
+{com}. 
+. use `posttmp', clear
+{txt}
+{com}. tempfile postdata
+{txt}
+{com}. save `postdata', replace
+{txt}{p 0 4 2}
+(file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000004.tmp{rm}
+not found)
+{p_end}
+{p 0 4 2}
+file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_1384_000004.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. * Merge pre- and post-matching statistics by covariate and treatment group.
+. use `predata', clear
+{txt}
+{com}. merge 1:1 Variable Group using `postdata', nogen
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}               0
+{txt}{col 5}Matched{col 30}{res}              10{txt}  
+{col 5}{hline 41}
+
+{com}. 
+. order Variable Group pre_mean pre_se pre_ll pre_ul post_mean post_se post_ll post_ul
+{txt}
+{com}. sort Variable Group
+{txt}
+{com}. 
+. * Restore the covariate order defined above.
+. gen order = .
+{txt}(10 missing values generated)
+
+{com}. replace order = 1 if Variable == "`label1'"
+{txt}(2 real changes made)
+
+{com}. replace order = 2 if Variable == "`label2'"
+{txt}(2 real changes made)
+
+{com}. replace order = 3 if Variable == "`label3'"
+{txt}(2 real changes made)
+
+{com}. replace order = 4 if Variable == "`label4'"
+{txt}(2 real changes made)
+
+{com}. replace order = 5 if Variable == "`label5'"
+{txt}(2 real changes made)
+
+{com}. sort order Group
+{txt}
+{com}. drop order
+{txt}
+{com}. 
+. * Format confidence intervals and export the final balance table.
+. preserve
+{txt}
+{com}.     * Format confidence intervals as bracketed strings with three decimals.
+.     gen str20 pre_ci  = "[" + string(pre_ll,  "%9.3f") + ", " + string(pre_ul,  "%9.3f") + "]"
+{txt}
+{com}.     gen str20 post_ci = "[" + string(post_ll, "%9.3f") + ", " + string(post_ul, "%9.3f") + "]"
+{txt}
+{com}. 
+.     * Export selected pre- and post-matching columns with descriptive labels.
+.     asdoc list ///
+>         Variable Group ///
+>         pre_mean pre_se pre_ci ///
+>         post_mean post_se post_ci, ///
+>         save(${c -(}table_output{c )-}main_cem_balance.doc) replace ///
+>         title(Balance: Pre- vs Post-Matching) ///
+>         dec(3)
+{txt}
+     {c TLC}{hline 48}{c -}{hline 11}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c TRC}
+     {c |} {res}                                      Variable       Group    pre_mean     pre_se               pre_ci   post_mean    post_se              post_ci {txt}{c |}
+     {c LT}{hline 48}{c -}{hline 11}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c RT}
+  1. {c |} {res}Log (number of patents filed before listing+1)     Control   .35260347   .0002538       [0.352, 0.353]   .97653259   .0132651       [0.951, 1.003] {txt}{c |}
+  2. {c |} {res}Log (number of patents filed before listing+1)   Treatment   1.4329653   .0231467       [1.388, 1.478]   .98002243    .018686       [0.943, 1.017] {txt}{c |}
+  3. {c |} {res}          Log (Prior scientific foundations+1)     Control   .07549885   .0001255       [0.075, 0.076]   .37455889   .0085734       [0.358, 0.391] {txt}{c |}
+  4. {c |} {res}          Log (Prior scientific foundations+1)   Treatment   .65011064   .0146877       [0.621, 0.679]   .38436798   .0107393       [0.363, 0.405] {txt}{c |}
+  5. {c |} {res}           Firm ownership (SOEs=1, non-SOEs=0)     Control   .04849276   .0001299       [0.048, 0.049]   .34809862   .0056203       [0.337, 0.359] {txt}{c |}
+     {c LT}{hline 48}{c -}{hline 11}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c RT}
+  6. {c |} {res}           Firm ownership (SOEs=1, non-SOEs=0)   Treatment   .43020305   .0088201       [0.413, 0.447]   .34809862    .009738       [0.329, 0.367] {txt}{c |}
+  7. {c |} {res}                                   Industry id     Control   311.29566    .113813   [311.073, 311.519]    447.0897   1.429655   [444.288, 449.892] {txt}{c |}
+  8. {c |} {res}                                   Industry id   Treatment   449.27475    2.89614   [443.598, 454.951]   446.25658   3.310336   [439.768, 452.745] {txt}{c |}
+  9. {c |} {res}                                   Province id     Control   36.013872   .0076905     [35.999, 36.029]   34.552144   .1628079     [34.233, 34.871] {txt}{c |}
+ 10. {c |} {res}                                   Province id   Treatment   34.699239   .2908673     [34.129, 35.269]   34.433347   .3448871     [33.757, 35.109] {txt}{c |}
+     {c BLC}{hline 48}{c -}{hline 11}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c -}{hline 11}{c -}{hline 10}{c -}{hline 20}{c BRC}
+Click to Open File:  {browse "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/main_cem_balance.doc"}
+
+{com}. restore
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 12:16:47
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

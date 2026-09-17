@@ -1,0 +1,462 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_IV.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 15:03:51
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\3_Supplementary_materials\F3_Alternative_identification\4_IV_reg.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—supplementary alternative identification
+> Script:  4_IV_reg.do
+> 
+> Purpose:
+>   Estimate an instrumental-variable specification in which post-2017 exposure
+>   to exports to U.S. adversary states instruments for the alternative sanction
+>   treatment. Report the baseline DID, first-stage, and two-stage least-squares
+>   estimates and summarize the magnitude of the first-stage relationship.
+> 
+> Main inputs (from ${c -(}stata_output{c )-}):
+>   - DID_allfirm-level.dta
+>   - firm_id_fapp_mapping.dta
+>   - exp_usadver_merge.dta
+> 
+> Main output (under ${c -(}table_output{c )-}):
+>   - IV_USadver_export.rtf: baseline DID, first-stage, and 2SLS estimates
+> 
+> Notes:
+>   Run through 3_Supplementary_materials/00_run_all.do so the shared path globals
+>   are available.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Assemble the firm-year IV analysis panel
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Attach the patent-applicant name associated with each firm identifier.
+. merge m:1 firm_id using ${c -(}stata_output{c )-}firm_id_fapp_mapping.dta
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}         249,776
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}         249,776{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}       2,739,581{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop if _merge==2
+{txt}(249,776 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. 
+. * Attach adversary-state export exposure by patent-applicant name.
+. merge m:1 fapp using ${c -(}stata_output{c )-}exp_usadver_merge.dta
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}       2,588,602
+{txt}{col 9}from master{col 30}{res}       2,584,409{txt}  (_merge==1)
+{col 9}from using{col 30}{res}           4,193{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}         155,172{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. 
+. replace f_usadver_dummy=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. replace f_usadver=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. replace f_usadver_value=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. 
+. replace f_usadver_criarea_dummy=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. replace f_usadver_criarea=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. replace f_usadver_value_criarea=0 if _merge==1
+{txt}(2,584,409 real changes made)
+
+{com}. 
+. drop if _merge==2
+{txt}(4,193 observations deleted)
+
+{com}. drop _merge firm_name
+{txt}
+{com}. 
+. 
+. order firm_id year did entity_list list_year dif_year ///
+> f_usadver_dummy f_usadver f_usadver_value ///
+> f_usadver_criarea_dummy f_usadver_criarea f_usadver_value_criarea
+{txt}
+{com}. 
+. gen ratio_criarea = f_usadver_value_criarea/f_usadver_value
+{txt}(2,584,409 missing values generated)
+
+{com}. * ==============================================================================
+. * 2. Construct the alternative treatment and instrumental variable
+. * ==============================================================================
+. gen post_trump = year > 2017
+{txt}
+{com}. 
+. gen export_iv = f_usadver_value/100000000 * post_trump
+{txt}
+{com}. gen did_new = entity_list * post_trump
+{txt}
+{com}. 
+. * ==============================================================================
+. * 3. Estimate the baseline DID, first stage, and 2SLS models
+. * ==============================================================================
+. 
+. reghdfe f_cite_science_num_w did_new whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  56525.86
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4315
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3499
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0704
+{txt}{col 51}Root MSE{col 67}= {res}    0.3473
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}did_new {c |}{col 14}{res}{space 2} .8301496{col 26}{space 2} .0442607{col 37}{space 1}   18.76{col 46}{space 3}0.000{col 54}{space 4} .7434002{col 67}{space 3} .9168991
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}  .264585{col 26}{space 2} .0007883{col 37}{space 1}  335.63{col 46}{space 3}0.000{col 54}{space 4} .2630399{col 67}{space 3} .2661301
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0263616{col 26}{space 2} .0001965{col 37}{space 1}  134.15{col 46}{space 3}0.000{col 54}{space 4} .0259765{col 67}{space 3} .0267467
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M0
+{txt}
+{com}. 
+. * Estimate the first stage using adversary-state export exposure.
+. reghdfe did_new export_iv whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}     72.84
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4565
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3785
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0036
+{txt}{col 51}Root MSE{col 67}= {res}    0.0169
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     did_new{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}export_iv {c |}{col 14}{res}{space 2} .1016806{col 26}{space 2} .0084262{col 37}{space 1}   12.07{col 46}{space 3}0.000{col 54}{space 4} .0851655{col 67}{space 3} .1181958
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} 4.09e-06{col 26}{space 2} .0000326{col 37}{space 1}    0.13{col 46}{space 3}0.900{col 54}{space 4}-.0000598{col 67}{space 3}  .000068
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .000446{col 26}{space 2} .0000131{col 37}{space 1}   34.10{col 46}{space 3}0.000{col 54}{space 4} .0004203{col 67}{space 3} .0004716
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Estimate the second stage using the instrumented treatment.
+. ivreghdfe f_cite_science_num_w whether_pat (did_new = export_iv), absorb(firm_id year) vce(robust) first
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}First-stage regressions
+{hline 23}
+
+
+First-stage regression of did_new:
+
+Statistics robust to heteroskedasticity
+Number of obs = {col 31}{res} 2739581
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     did_new{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}export_iv {c |}{col 14}{res}{space 2} .1016806{col 26}{space 2} .0084262{col 37}{space 1}   12.07{col 46}{space 3}0.000{col 54}{space 4} .0851655{col 67}{space 3} .1181958
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} 4.09e-06{col 26}{space 2} .0000326{col 37}{space 1}    0.13{col 46}{space 3}0.900{col 54}{space 4}-.0000598{col 67}{space 3}  .000068
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+F test of excluded instruments:
+  F(  1,2395764) = {res}  145.62
+{txt}  Prob > F      = {res}  0.0000
+{help ivreg2##swstats:Sanderson-Windmeijer multivariate F test of excluded instruments:}
+{txt}  F(  1,2395764) = {res}  145.62
+{txt}  Prob > F      = {res}  0.0000
+
+
+
+{txt}Summary results for first-stage regressions
+{hline 43}
+
+{col 44}{help ivreg2##swstats:(Underid)}{col 65}{help ivreg2##swstats:(Weak id)}
+Variable     |{col 16}{help ivreg2##swstats:F}({res}{col 17}  1{txt},{res}2395764{txt})  P-val{col 37}|{col 39}{help ivreg2##swstats:SW Chi-sq}({res}  1{txt}) P-val{col 60}|{col 62}{help ivreg2##swstats:SW F}({res}{col 67}  1{txt},{res}2395764{txt})
+{res}did_new     {col 14}{txt}|{col 18}{res}  145.62{col 28}  0.0000{col 37}{txt}|{col 42}{res}  166.51{col 51}  0.0000{col 60}{txt}|{col 65}{res}  145.62
+
+{txt}NB: first-stage test statistics heteroskedasticity-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+{res}{txt}{col 36}10% maximal IV size{res}{col 67} 16.38
+{txt}{col 36}15% maximal IV size{res}{col 67}  8.96
+{txt}{col 36}20% maximal IV size{res}{col 67}  6.66
+{txt}{col 36}25% maximal IV size{res}{col 67}  5.53
+{txt}Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+{help ivreg2##idtest:Underidentification test}
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+{res}Kleibergen-Paap rk LM statistic{txt}{col 42}Chi-sq({res}1{txt})={res}12.15  {col 61}{txt}P-val={res}0.0005
+
+{help ivreg2##widtest:Weak identification test}
+{txt}Ho: equation is weakly identified
+{res}Cragg-Donald Wald F statistic{col 65} 8769.37
+Kleibergen-Paap Wald rk F statistic{col 65}  145.62
+
+{txt}Stock-Yogo weak ID test critical values for K1=1 and L1=1:
+{res}{txt}{col 36}10% maximal IV size{res}{col 67} 16.38
+{txt}{col 36}15% maximal IV size{res}{col 67}  8.96
+{txt}{col 36}20% maximal IV size{res}{col 67}  6.66
+{txt}{col 36}25% maximal IV size{res}{col 67}  5.53
+{txt}Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+{help ivreg2##wirobust:Weak-instrument-robust inference}
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+{res}Anderson-Rubin Wald test{txt}{col 36}F({res}1{txt},{res}2395764{txt})={col 49}{res}   8.38{col 61}{txt}P-val={res}0.0038
+Anderson-Rubin Wald test{txt}{col 36}Chi-sq({res}1{txt})={col 49}{res}   9.58{col 61}{txt}P-val={res}0.0020
+Stock-Wright LM S statistic{txt}{col 36}Chi-sq({res}1{txt})={col 49}{res}  18.64{col 61}{txt}P-val={res}0.0000
+
+{txt}NB: Underidentification, weak identification and weak-identification-robust
+    test statistics heteroskedasticity-robust
+
+Number of observations               N  = {res}   2739581
+{txt}Number of regressors                 K  = {res}         2
+{txt}Number of endogenous regressors      K1 = {res}         1
+{txt}Number of instruments                L  = {res}         2
+{txt}Number of excluded instruments       L1 = {res}         1
+
+{txt}IV (2SLS) estimation
+{hline 20}
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity
+
+{col 55}Number of obs = {res} 2739581
+{txt}{col 55}F(  2,2395764) = {res}56331.44
+{txt}{col 55}Prob > F      = {res}  0.0000
+{txt}Total (centered) SS     = {res} 310795.9774{txt}{col 55}Centered R2   = {res}  0.0702
+{txt}Total (uncentered) SS   = {res} 310795.9774{txt}{col 55}Uncentered R2 = {res}  0.0702
+{txt}Residual SS             = {res} 288977.2532{txt}{col 55}Root MSE      = {res}   .3473
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_sci~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}did_new {c |}{col 14}{res}{space 2} 1.115802{col 26}{space 2} .4464875{col 37}{space 1}    2.50{col 46}{space 3}0.012{col 54}{space 4} .2407024{col 67}{space 3} 1.990902
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .2645875{col 26}{space 2} .0007884{col 37}{space 1}  335.61{col 46}{space 3}0.000{col 54}{space 4} .2630423{col 67}{space 3} .2661327
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{help ivreg2##idtest:Underidentification test} (Kleibergen-Paap rk LM statistic):{res}{col 71}  12.149
+{txt}{col 52}Chi-sq({res}1{txt}) P-val =  {res}{col 73}0.0005
+{txt}{hline 78}
+{help ivreg2##widtest:Weak identification test} (Cragg-Donald Wald F statistic):{res}{col 71}8769.369
+{txt}                         (Kleibergen-Paap rk Wald F statistic):{res}{col 71} 145.616
+{txt}Stock-Yogo weak ID test critical values:{res}{txt}{col 42}10% maximal IV size{res}{col 73} 16.38
+{txt}{col 42}15% maximal IV size{res}{col 73}  8.96
+{txt}{col 42}20% maximal IV size{res}{col 73}  6.66
+{txt}{col 42}25% maximal IV size{res}{col 73}  5.53
+{txt}Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+{hline 78}
+{help ivreg2##overidtests:Hansen J statistic} (overidentification test of all instruments):{res}{col 71}   0.000
+{txt}{col 50}(equation exactly identified)
+{hline 78}
+Instrumented:{col 23}did_new
+Included instruments:{col 23}whether_pat
+Excluded instruments:{col 23}export_iv
+{help ivreg2##partial:Partialled-out}:{col 23}_cons
+{col 23}nb: total SS, model F and R2s are after partialling-out;
+{col 23}    any {help ivreg2##s_small:small-sample adjustments} include partialled-out
+{col 23}    variables in regressor count K
+{hline 78}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * ==============================================================================
+. * 4. Scale the first-stage estimate to one standard deviation of exposure
+. * ==============================================================================
+. 
+. * Re-estimate the first stage and retain its coefficient and estimation sample.
+. reghdfe did_new export_iv whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}     72.84
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4565
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3785
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0036
+{txt}{col 51}Root MSE{col 67}= {res}    0.0169
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     did_new{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}export_iv {c |}{col 14}{res}{space 2} .1016806{col 26}{space 2} .0084262{col 37}{space 1}   12.07{col 46}{space 3}0.000{col 54}{space 4} .0851655{col 67}{space 3} .1181958
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} 4.09e-06{col 26}{space 2} .0000326{col 37}{space 1}    0.13{col 46}{space 3}0.900{col 54}{space 4}-.0000598{col 67}{space 3}  .000068
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .000446{col 26}{space 2} .0000131{col 37}{space 1}   34.10{col 46}{space 3}0.000{col 54}{space 4} .0004203{col 67}{space 3} .0004716
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. local pi = _b[export_iv]
+{txt}
+{com}. 
+. gen sample_m1 = e(sample)
+{txt}
+{com}. 
+. * Express pre-period adversary-state export exposure in the instrument's units.
+. gen adv_export_pre = f_usadver_value / 100000000
+{txt}
+{com}. 
+. * Calculate its firm-level standard deviation after removing repeated firm-years.
+. preserve
+{txt}
+{com}.     keep if sample_m1 == 1
+{txt}(0 observations deleted)
+
+{com}.     keep firm_id adv_export_pre
+{txt}
+{com}.     duplicates drop firm_id, force
+
+{p 0 4}{txt}Duplicates in terms of {res} firm_id{p_end}
+
+{txt}(2,395,778 observations deleted)
+
+{com}. 
+.     sum adv_export_pre
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+adv_export~e {c |}{res}    343,803    .0002964    .0160547          0    7.46231
+{txt}
+{com}.     local sd_adv = r(sd)
+{txt}
+{com}. restore
+{txt}
+{com}. 
+. * Convert a one-standard-deviation exposure increase to probability-point effects.
+. local effect_prob = `pi' * `sd_adv'
+{txt}
+{com}. local effect_pp   = `effect_prob' * 100
+{txt}
+{com}. 
+. * Calculate the treatment mean in the full first-stage estimation sample.
+. sum did_new if sample_m1 == 1
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}did_new {c |}{res}  2,739,581    .0004588    .0214154          0          1
+{txt}
+{com}. local mean_full = r(mean)
+{txt}
+{com}. 
+. * Calculate the treatment mean for post-2017 observations in that sample.
+. sum did_new if sample_m1 == 1 & post_trump == 1
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}did_new {c |}{res}  1,041,674    .0012067    .0347168          0          1
+{txt}
+{com}. local mean_post = r(mean)
+{txt}
+{com}. 
+. * Express the scaled effect relative to both treatment means.
+. local pct_full = (`effect_prob' / `mean_full') * 100
+{txt}
+{com}. local pct_post = (`effect_prob' / `mean_post') * 100
+{txt}
+{com}. 
+. display "First-stage coefficient = " `pi'
+{res}First-stage coefficient = .10168064
+{txt}
+{com}. display "Firm-level SD of pre-period adversary export exposure = " `sd_adv'
+{res}Firm-level SD of pre-period adversary export exposure = .01605468
+{txt}
+{com}. display "Effect in probability = " `effect_prob'
+{res}Effect in probability = .00163245
+{txt}
+{com}. display "Effect in percentage points = " `effect_pp'
+{res}Effect in percentage points = .16324502
+{txt}
+{com}. display "Relative to full-sample mean of did_new (%) = " `pct_full'
+{res}Relative to full-sample mean of did_new (%) = 355.78597
+{txt}
+{com}. display "Relative to post-Trump mean of did_new (%) = " `pct_post'
+{res}Relative to post-Trump mean of did_new (%) = 135.2809
+{txt}
+{com}. * ==============================================================================
+. * 5. Export the combined IV results table
+. * ==============================================================================
+. 
+. esttab M0 M1 M2 using ${c -(}table_output{c )-}IV_USadver_export.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop(whether_pat) ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("DID" "IV: First stage " "IV: 2SLS") ///
+>         nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/IV_USadver_export.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_IV.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 15:05:26
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

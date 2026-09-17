@@ -1,0 +1,1301 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_knowledge_source.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 12:24:48
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\1_Chinese_firms\03_knowledge_source.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—Chinese-firm analysis
+> Script:  03_knowledge_source.do
+> 
+> Purpose:
+>   Examine how the estimated treatment effect varies with the geographic source
+>   and international breadth of scientific knowledge cited by Chinese-firm
+>   patents. The script compares domestic, foreign, U.S., and non-U.S. foreign
+>   sources using count and share outcomes in full and CEM-weighted samples.
+> 
+> Main inputs:
+>   - ${c -(}stata_output{c )-}DID_allfirm-level.dta (full firm-year panel)
+>   - ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta (CEM panel and weights)
+> 
+> Main outputs:
+>   - ${c -(}table_output{c )-}compare_source_num.rtf
+>   - ${c -(}table_output{c )-}compare_source_num_cem.rtf
+>   - ${c -(}table_output{c )-}multi_coutry_science.rtf
+>   - ${c -(}table_output{c )-}compare_source_ratio.rtf
+> 
+> Required setup:
+>   The master runner defines stata_output and table_output before calling this
+>   file. The script also requires the community-contributed commands reghdfe,
+>   ppmlhdfe, and esttab.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate full-sample models by geographic source of cited science
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Models 1-3: domestic scientific sources.
+. reghdfe f_cite_cn_sci_num_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  53936.83
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4278
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3456
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0668
+{txt}{col 51}Root MSE{col 67}= {res}    0.3391
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_cn_~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .9875597{col 26}{space 2} .0731575{col 37}{space 1}   13.50{col 46}{space 3}0.000{col 54}{space 4} .8441737{col 67}{space 3} 1.130946
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .2522165{col 26}{space 2} .0007688{col 37}{space 1}  328.08{col 46}{space 3}0.000{col 54}{space 4} .2507097{col 67}{space 3} .2537232
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0255716{col 26}{space 2} .0001909{col 37}{space 1}  133.97{col 46}{space 3}0.000{col 54}{space 4} .0251975{col 67}{space 3} .0259458
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. reghdfe ln_f_cite_cn_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  61690.43
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4553
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3771
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0805
+{txt}{col 51}Root MSE{col 67}= {res}    0.1915
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}l~cn_sci_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .7989179{col 26}{space 2} .0528712{col 37}{space 1}   15.11{col 46}{space 3}0.000{col 54}{space 4} .6952923{col 67}{space 3} .9025435
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .1567015{col 26}{space 2} .0004468{col 37}{space 1}  350.75{col 46}{space 3}0.000{col 54}{space 4} .1558258{col 67}{space 3} .1575771
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0143791{col 26}{space 2} .0001087{col 37}{space 1}  132.33{col 46}{space 3}0.000{col 54}{space 4} .0141661{col 67}{space 3}  .014592
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. ppmlhdfe f_cite_cn_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 1944810 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 519893 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 32112 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.5946e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}6{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.65  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}3.0015e+05 {col 39}{txt}eps = {res}1.98e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.59  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}2.9608e+05 {col 39}{txt}eps = {res}1.37e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.22  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}2.9601e+05 {col 39}{txt}eps = {res}2.30e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.43  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}2.9601e+05 {col 39}{txt}eps = {res}2.78e-07 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.45  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}2.9601e+05 {col 39}{txt}eps = {res}1.85e-12 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.45  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}2.9601e+05 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res} -5.45  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}2.9601e+05 {col 39}{txt}eps = {res}1.43e-16 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.45  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 28 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}   242,766
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}   181,805
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     17.91
+{txt}Deviance{col 22}={col 24}{res} 296011.8816{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0000
+{txt}Log pseudolikelihood ={col 24}{res}-291900.6537{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.6003
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_cn_~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4780554{col 26}{space 2} .1129523{col 37}{space 1}    4.23{col 46}{space 3}0.000{col 54}{space 4} .2566731{col 67}{space 3} .6994378
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2}  1.63409{col 26}{space 2} .0079412{col 37}{space 1}  205.77{col 46}{space 3}0.000{col 54}{space 4} 1.618525{col 67}{space 3} 1.649654
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    60948{col 27}{space 1}        0{col 39}{result}{space 1}    60948{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Models 4-6: all foreign scientific sources.
+. reghdfe f_cite_foreign_sci_num_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  14275.95
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2740
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1698
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0193
+{txt}{col 51}Root MSE{col 67}= {res}    0.1122
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_for~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2772557{col 26}{space 2} .0231237{col 37}{space 1}   11.99{col 46}{space 3}0.000{col 54}{space 4} .2319341{col 67}{space 3} .3225773
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0432961{col 26}{space 2}  .000257{col 37}{space 1}  168.49{col 46}{space 3}0.000{col 54}{space 4} .0427925{col 67}{space 3} .0437997
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0050465{col 26}{space 2} .0000581{col 37}{space 1}   86.79{col 46}{space 3}0.000{col 54}{space 4} .0049325{col 67}{space 3} .0051605
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. reghdfe ln_f_cite_foreign_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  11354.43
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3342
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2386
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0160
+{txt}{col 51}Root MSE{col 67}= {res}    0.1054
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_cite_f~{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .5709308{col 26}{space 2} .0436425{col 37}{space 1}   13.08{col 46}{space 3}0.000{col 54}{space 4}  .485393{col 67}{space 3} .6564686
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0332214{col 26}{space 2} .0002218{col 37}{space 1}  149.81{col 46}{space 3}0.000{col 54}{space 4} .0327868{col 67}{space 3} .0336561
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0055994{col 26}{space 2} .0000624{col 37}{space 1}   89.72{col 46}{space 3}0.000{col 54}{space 4} .0054771{col 67}{space 3} .0057217
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. ppmlhdfe f_cite_foreign_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 2484184 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 153782 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 7794 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}1.0059e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.03  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}8.7098e+04 {col 39}{txt}eps = {res}1.55e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.90  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}8.6053e+04 {col 39}{txt}eps = {res}1.21e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.47  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}8.6023e+04 {col 39}{txt}eps = {res}3.49e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.64  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}8.6023e+04 {col 39}{txt}eps = {res}1.93e-06 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.65  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}8.6023e+04 {col 39}{txt}eps = {res}2.30e-10 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.65  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}8.6023e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -5.65  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}8.6023e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}1{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.65  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 27 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    93,821
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    72,943
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     10.99
+{txt}Deviance{col 22}={col 24}{res} 86023.25993{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0009
+{txt}Log pseudolikelihood ={col 24}{res}-82594.99662{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.5172
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_for~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4305442{col 26}{space 2} .1298475{col 37}{space 1}    3.32{col 46}{space 3}0.001{col 54}{space 4} .1760478{col 67}{space 3} .6850406
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2}    .9462{col 26}{space 2} .0096516{col 37}{space 1}   98.04{col 46}{space 3}0.000{col 54}{space 4} .9272833{col 67}{space 3} .9651167
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    20865{col 27}{space 1}        0{col 39}{result}{space 1}    20865{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. 
+. * Models 7-9: U.S. scientific sources.
+. reghdfe f_cite_us_sci_num_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}   4467.79
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2320
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1218
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0064
+{txt}{col 51}Root MSE{col 67}= {res}    0.0705
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_us_~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .1969161{col 26}{space 2} .0210214{col 37}{space 1}    9.37{col 46}{space 3}0.000{col 54}{space 4} .1557149{col 67}{space 3} .2381172
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}  .014645{col 26}{space 2} .0001558{col 37}{space 1}   94.02{col 46}{space 3}0.000{col 54}{space 4} .0143397{col 67}{space 3} .0149503
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0021823{col 26}{space 2} .0000372{col 37}{space 1}   58.72{col 46}{space 3}0.000{col 54}{space 4} .0021095{col 67}{space 3} .0022552
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M7
+{txt}
+{com}. reghdfe ln_f_cite_us_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}   3718.81
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2901
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1882
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0071
+{txt}{col 51}Root MSE{col 67}= {res}    0.0606
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln~s_sci_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3069199{col 26}{space 2} .0308697{col 37}{space 1}    9.94{col 46}{space 3}0.000{col 54}{space 4} .2464163{col 67}{space 3} .3674235
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0107648{col 26}{space 2}  .000126{col 37}{space 1}   85.40{col 46}{space 3}0.000{col 54}{space 4} .0105177{col 67}{space 3} .0110118
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0020972{col 26}{space 2} .0000352{col 37}{space 1}   59.56{col 46}{space 3}0.000{col 54}{space 4} .0020282{col 67}{space 3} .0021662
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M8
+{txt}
+{com}. ppmlhdfe f_cite_us_sci_num did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 2636072 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 56536 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 2410 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.8506e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.44  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}3.4622e+04 {col 39}{txt}eps = {res}1.12e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.20  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}3.4362e+04 {col 39}{txt}eps = {res}7.56e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.59  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}3.4356e+04 {col 39}{txt}eps = {res}1.72e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.67  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}3.4356e+04 {col 39}{txt}eps = {res}6.43e-07 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.67  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}3.4356e+04 {col 39}{txt}eps = {res}3.35e-11 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -4.67  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}3.4356e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res} -4.67  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}3.4356e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}1{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -4.67  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 27 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    44,563
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    35,593
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      4.37
+{txt}Deviance{col 22}={col 24}{res} 34355.69671{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0366
+{txt}Log pseudolikelihood ={col 24}{res}-31759.51609{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.3864
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_us_~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2853577{col 26}{space 2} .1364908{col 37}{space 1}    2.09{col 46}{space 3}0.037{col 54}{space 4} .0178407{col 67}{space 3} .5528746
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .1904568{col 26}{space 2} .0111182{col 37}{space 1}   17.13{col 46}{space 3}0.000{col 54}{space 4} .1686655{col 67}{space 3} .2122481
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}     8957{col 27}{space 1}        0{col 39}{result}{space 1}     8957{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M9
+{txt}
+{com}. 
+. * Models 10-12: non-U.S. foreign scientific sources.
+. reghdfe f_cite_nonus_foreign_sci_num_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  11105.51
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2562
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1494
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0148
+{txt}{col 51}Root MSE{col 67}= {res}    0.1033
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_non~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2651722{col 26}{space 2} .0228009{col 37}{space 1}   11.63{col 46}{space 3}0.000{col 54}{space 4} .2204832{col 67}{space 3} .3098612
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0345165{col 26}{space 2} .0002324{col 37}{space 1}  148.53{col 46}{space 3}0.000{col 54}{space 4}  .034061{col 67}{space 3} .0349719
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0044488{col 26}{space 2} .0000534{col 37}{space 1}   83.28{col 46}{space 3}0.000{col 54}{space 4} .0043441{col 67}{space 3} .0045535
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M10
+{txt}
+{com}. reghdfe ln_f_cite_nonus_foreign_sci_num did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}   8841.10
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3142
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2158
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0129
+{txt}{col 51}Root MSE{col 67}= {res}    0.0944
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}l~nonus_fo~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .5028584{col 26}{space 2} .0408122{col 37}{space 1}   12.32{col 46}{space 3}0.000{col 54}{space 4} .4228678{col 67}{space 3} .5828489
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0259415{col 26}{space 2} .0001965{col 37}{space 1}  132.03{col 46}{space 3}0.000{col 54}{space 4} .0255564{col 67}{space 3} .0263266
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .004711{col 26}{space 2} .0000557{col 37}{space 1}   84.55{col 46}{space 3}0.000{col 54}{space 4} .0046018{col 67}{space 3} .0048202
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M11
+{txt}
+{com}. ppmlhdfe f_cite_nonus_foreign_sci_num did whether_pat, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 2519349 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 130500 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 6258 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}8.3467e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.03  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}7.2992e+04 {col 39}{txt}eps = {res}1.44e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.92  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}7.2182e+04 {col 39}{txt}eps = {res}1.12e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.59  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}3.42e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.78  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}2.15e-06 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.80  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}3.30e-10 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.80  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -5.80  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}1.25e-16 {txt}{col 55}{txt}iters = {res}1{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.80  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 27 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    83,474
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    65,319
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     16.28
+{txt}Deviance{col 22}={col 24}{res} 72157.14882{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0001
+{txt}Log pseudolikelihood ={col 24}{res}-68498.43158{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.4853
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_non~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .5338541{col 26}{space 2} .1323265{col 37}{space 1}    4.03{col 46}{space 3}0.000{col 54}{space 4} .2744988{col 67}{space 3} .7932093
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .7346724{col 26}{space 2} .0099262{col 37}{space 1}   74.01{col 46}{space 3}0.000{col 54}{space 4} .7152173{col 67}{space 3} .7541275
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    18142{col 27}{space 1}        0{col 39}{result}{space 1}    18142{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M12
+{txt}
+{com}. 
+. 
+. * Export the twelve source-specific count models.
+. esttab M1 M2 M3 M4 M5 M6 M7 M8 M9 M10 M11 M12 using ${c -(}table_output{c )-}compare_source_num.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4" "Model 5" "Model 6" "Model 7" "Model 8" "Model 9" "Model 10" "Model 11" "Model 12") ///
+>         nonotes 
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/compare_source_num.rtf"'})
+
+{com}. 
+. 
+. 
+. 
+. 
+. * ==============================================================================
+. * 2. Estimate CEM-weighted models by geographic source of cited science
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta, clear
+{txt}
+{com}. 
+. 
+. * Models 1-3: domestic scientific sources.
+. reghdfe f_cite_cn_sci_num_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}    182.15
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5109
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4422
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0742
+{txt}{col 51}Root MSE{col 67}= {res}    0.7856
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_cn_~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3332908{col 26}{space 2} .0907567{col 37}{space 1}    3.67{col 46}{space 3}0.000{col 54}{space 4} .1554106{col 67}{space 3} .5111711
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .6045387{col 26}{space 2} .0318597{col 37}{space 1}   18.98{col 46}{space 3}0.000{col 54}{space 4} .5420947{col 67}{space 3} .6669827
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1915831{col 26}{space 2} .0154584{col 37}{space 1}   12.39{col 46}{space 3}0.000{col 54}{space 4} .1612852{col 67}{space 3} .2218811
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. reghdfe ln_f_cite_cn_sci_num did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}    232.54
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.5265
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4599
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0851
+{txt}{col 51}Root MSE{col 67}= {res}    0.4205
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}l~cn_sci_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3287516{col 26}{space 2} .0614148{col 37}{space 1}    5.35{col 46}{space 3}0.000{col 54}{space 4} .2083806{col 67}{space 3} .4491226
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .3482711{col 26}{space 2} .0166065{col 37}{space 1}   20.97{col 46}{space 3}0.000{col 54}{space 4}  .315723{col 67}{space 3} .3808193
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1005744{col 26}{space 2} .0085602{col 37}{space 1}   11.75{col 46}{space 3}0.000{col 54}{space 4} .0837968{col 67}{space 3} .1173521
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. ppmlhdfe f_cite_cn_sci_num did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 539679 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 128968 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 9477 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.8054e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -1.93  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}3.4088e+05 {col 39}{txt}eps = {res}1.16e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -2.90  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}3.3882e+05 {col 39}{txt}eps = {res}6.09e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.66  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}3.3875e+05 {col 39}{txt}eps = {res}1.92e-04 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.04  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}3.3875e+05 {col 39}{txt}eps = {res}1.83e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.13  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}3.3875e+05 {col 39}{txt}eps = {res}6.14e-10 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -4.14  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}3.3875e+05 {col 39}{txt}eps = {res}3.57e-16 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -4.14  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}3.3875e+05 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -4.14  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 24 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    33,293
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    22,841
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}     10.56
+{txt}Deviance{col 22}={col 24}{res} 338751.5868{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0012
+{txt}Log pseudolikelihood ={col 24}{res}-353074.1605{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.5151
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_cn_~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4277433{col 26}{space 2} .1316562{col 37}{space 1}    3.25{col 46}{space 3}0.001{col 54}{space 4} .1697019{col 67}{space 3} .6857846
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} 1.563348{col 26}{space 2} .0303753{col 37}{space 1}   51.47{col 46}{space 3}0.000{col 54}{space 4} 1.503813{col 67}{space 3} 1.622882
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    10439{col 27}{space 1}        0{col 39}{result}{space 1}    10439{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Models 4-6: all foreign scientific sources.
+. reghdfe f_cite_foreign_sci_num_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     78.05
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3734
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2854
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0232
+{txt}{col 51}Root MSE{col 67}= {res}    0.2201
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_for~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0967635{col 26}{space 2} .0293023{col 37}{space 1}    3.30{col 46}{space 3}0.001{col 54}{space 4} .0393319{col 67}{space 3}  .154195
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0922017{col 26}{space 2} .0075252{col 37}{space 1}   12.25{col 46}{space 3}0.000{col 54}{space 4} .0774525{col 67}{space 3} .1069509
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0348935{col 26}{space 2} .0039616{col 37}{space 1}    8.81{col 46}{space 3}0.000{col 54}{space 4} .0271289{col 67}{space 3} .0426581
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. reghdfe ln_f_cite_foreign_sci_num did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     55.75
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3743
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2863
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0146
+{txt}{col 51}Root MSE{col 67}= {res}    0.2446
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_cite_f~{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2493432{col 26}{space 2} .0497875{col 37}{space 1}    5.01{col 46}{space 3}0.000{col 54}{space 4} .1517612{col 67}{space 3} .3469251
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0799154{col 26}{space 2} .0086444{col 37}{space 1}    9.24{col 46}{space 3}0.000{col 54}{space 4} .0629726{col 67}{space 3} .0968581
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0398783{col 26}{space 2}  .004964{col 37}{space 1}    8.03{col 46}{space 3}0.000{col 54}{space 4} .0301491{col 67}{space 3} .0496076
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. ppmlhdfe f_cite_foreign_sci_num did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 661575 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 36519 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 2494 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}1.3014e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -2.69  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}1.1630e+05 {col 39}{txt}eps = {res}1.19e-01 {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.96  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}1.1536e+05 {col 39}{txt}eps = {res}8.10e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.98  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}2.98e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.55  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}1.44e-05 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.76  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}1.51e-07 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.78  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}2.27e-11 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-06{col 82}{txt} min(eta) = {res} -5.78  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}6.19e-16 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res} -5.78  {txt} S  
+{txt}{col  0}Iteration 9:{txt}{col 16}deviance = {res}1.1533e+05 {col 39}{txt}eps = {res}2.48e-16 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.78  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 9 iterations and 28 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    10,829
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}     7,602
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      5.11
+{txt}Deviance{col 22}={col 24}{res}  115325.705{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0237
+{txt}Log pseudolikelihood ={col 24}{res}-118066.2174{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.4359
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_for~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3897998{col 26}{space 2} .1723708{col 37}{space 1}    2.26{col 46}{space 3}0.024{col 54}{space 4} .0519592{col 67}{space 3} .7276404
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .6319962{col 26}{space 2} .0527833{col 37}{space 1}   11.97{col 46}{space 3}0.000{col 54}{space 4} .5285429{col 67}{space 3} .7354496
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}     3214{col 27}{space 1}        0{col 39}{result}{space 1}     3214{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. 
+. * Models 7-9: U.S. scientific sources.
+. reghdfe f_cite_us_sci_num_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     14.31
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2590
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1548
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0024
+{txt}{col 51}Root MSE{col 67}= {res}    0.1555
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_us_~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0986185{col 26}{space 2} .0253422{col 37}{space 1}    3.89{col 46}{space 3}0.000{col 54}{space 4} .0489485{col 67}{space 3} .1482884
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0203276{col 26}{space 2} .0049224{col 37}{space 1}    4.13{col 46}{space 3}0.000{col 54}{space 4} .0106799{col 67}{space 3} .0299753
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0210216{col 26}{space 2} .0031495{col 37}{space 1}    6.67{col 46}{space 3}0.000{col 54}{space 4} .0148486{col 67}{space 3} .0271945
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M7
+{txt}
+{com}. reghdfe ln_f_cite_us_sci_num did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     20.99
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2467
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1408
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0025
+{txt}{col 51}Root MSE{col 67}= {res}    0.1388
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln~s_sci_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .1772694{col 26}{space 2} .0342527{col 37}{space 1}    5.18{col 46}{space 3}0.000{col 54}{space 4} .1101351{col 67}{space 3} .2444036
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0167946{col 26}{space 2}   .00409{col 37}{space 1}    4.11{col 46}{space 3}0.000{col 54}{space 4} .0087784{col 67}{space 3} .0248108
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0173179{col 26}{space 2} .0027784{col 37}{space 1}    6.23{col 46}{space 3}0.000{col 54}{space 4} .0118725{col 67}{space 3} .0227634
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M8
+{txt}
+{com}. ppmlhdfe f_cite_us_sci_num did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r)
+{res}{txt}(dropped 694926 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 11442 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 734 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{txt} $$ Stopping (no negative residuals); separation found in {res}0{txt} observations (1 iterations and 13 subiterations)
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}5.7317e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.02  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}5.0635e+04 {col 39}{txt}eps = {res}1.32e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.10  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}5.0020e+04 {col 39}{txt}eps = {res}1.23e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.07  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}4.9992e+04 {col 39}{txt}eps = {res}5.61e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.78  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}4.9991e+04 {col 39}{txt}eps = {res}2.86e-05 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -6.15  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}4.9991e+04 {col 39}{txt}eps = {res}9.45e-07 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -6.24  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}4.9991e+04 {col 39}{txt}eps = {res}1.91e-09 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-06{col 82}{txt} min(eta) = {res} -6.24  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}4.9991e+04 {col 39}{txt}eps = {res}8.68e-15 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res} -6.24  {txt} S  
+{txt}{col  0}Iteration 9:{txt}{col 16}deviance = {res}4.9991e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -6.24  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 9 iterations and 30 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}     4,315
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}     3,134
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      0.97
+{txt}Deviance{col 22}={col 24}{res} 49990.62247{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.3241
+{txt}Log pseudolikelihood ={col 24}{res}-47141.15503{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.3264
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_us_~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2362224{col 26}{space 2} .2395534{col 37}{space 1}    0.99{col 46}{space 3}0.324{col 54}{space 4}-.2332937{col 67}{space 3} .7057385
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2}-.2704766{col 26}{space 2} .0851077{col 37}{space 1}   -3.18{col 46}{space 3}0.001{col 54}{space 4}-.4372846{col 67}{space 3}-.1036685
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}     1168{col 27}{space 1}        0{col 39}{result}{space 1}     1168{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M9
+{txt}
+{com}. 
+. * Models 10-12: non-U.S. foreign scientific sources.
+. reghdfe f_cite_nonus_foreign_sci_num_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     63.98
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3463
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2544
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0190
+{txt}{col 51}Root MSE{col 67}= {res}    0.2097
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_non~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0957657{col 26}{space 2} .0288785{col 37}{space 1}    3.32{col 46}{space 3}0.001{col 54}{space 4} .0391648{col 67}{space 3} .1523667
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0791536{col 26}{space 2} .0071952{col 37}{space 1}   11.00{col 46}{space 3}0.000{col 54}{space 4} .0650512{col 67}{space 3}  .093256
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0301081{col 26}{space 2} .0038136{col 37}{space 1}    7.89{col 46}{space 3}0.000{col 54}{space 4} .0226335{col 67}{space 3} .0375827
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M10
+{txt}
+{com}. reghdfe ln_f_cite_nonus_foreign_sci_num did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     49.14
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3474
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2557
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0133
+{txt}{col 51}Root MSE{col 67}= {res}    0.2216
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}l~nonus_fo~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2147441{col 26}{space 2} .0456298{col 37}{space 1}    4.71{col 46}{space 3}0.000{col 54}{space 4} .1253112{col 67}{space 3}  .304177
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0691162{col 26}{space 2} .0080232{col 37}{space 1}    8.61{col 46}{space 3}0.000{col 54}{space 4} .0533911{col 67}{space 3} .0848413
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0316484{col 26}{space 2} .0044537{col 37}{space 1}    7.11{col 46}{space 3}0.000{col 54}{space 4} .0229193{col 67}{space 3} .0403774
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M11
+{txt}
+{com}. ppmlhdfe f_cite_nonus_foreign_sci_num did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r)
+{res}{txt}(dropped 670675 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 29632 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 1963 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}1.1258e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -2.67  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}1.0133e+05 {col 39}{txt}eps = {res}1.11e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.87  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}1.0063e+05 {col 39}{txt}eps = {res}6.96e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.81  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}1.0061e+05 {col 39}{txt}eps = {res}2.09e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.31  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}1.0061e+05 {col 39}{txt}eps = {res}8.27e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.47  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}1.0061e+05 {col 39}{txt}eps = {res}4.93e-08 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.48  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}1.0061e+05 {col 39}{txt}eps = {res}2.12e-12 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -5.48  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}1.0061e+05 {col 39}{txt}eps = {res}1.23e-16 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.48  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 28 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}     9,147
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}     6,472
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      6.56
+{txt}Deviance{col 22}={col 24}{res} 100610.1467{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0104
+{txt}Log pseudolikelihood ={col 24}{res}-101141.1167{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.3990
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_non~m{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4988379{col 26}{space 2} .1947764{col 37}{space 1}    2.56{col 46}{space 3}0.010{col 54}{space 4} .1170832{col 67}{space 3} .8805925
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .3977471{col 26}{space 2} .0543953{col 37}{space 1}    7.31{col 46}{space 3}0.000{col 54}{space 4} .2911343{col 67}{space 3} .5043599
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}     2662{col 27}{space 1}        0{col 39}{result}{space 1}     2662{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M12
+{txt}
+{com}. 
+. 
+. * Export the twelve CEM-weighted source-specific count models.
+. esttab M1 M2 M3 M4 M5 M6 M7 M8 M9 M10 M11 M12 using ${c -(}table_output{c )-}compare_source_num_cem.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4" "Model 5" "Model 6" "Model 7" "Model 8" "Model 9" "Model 10" "Model 11" "Model 12") ///
+>         nonotes 
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/compare_source_num_cem.rtf"'})
+
+{com}. 
+. 
+. 
+. * ==============================================================================
+. * 3. Estimate effects on the international breadth of cited science
+. * ==============================================================================
+. 
+. * Estimate full-sample level, log, and Poisson specifications.
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. reghdfe f_multi_country_w did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}  11136.33
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.2620
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1561
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0150
+{txt}{col 51}Root MSE{col 67}= {res}    0.1025
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_multi_co~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2577156{col 26}{space 2} .0226999{col 37}{space 1}   11.35{col 46}{space 3}0.000{col 54}{space 4} .2132245{col 67}{space 3} .3022067
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0345767{col 26}{space 2} .0002324{col 37}{space 1}  148.77{col 46}{space 3}0.000{col 54}{space 4} .0341211{col 67}{space 3} .0350322
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0043453{col 26}{space 2} .0000532{col 37}{space 1}   81.75{col 46}{space 3}0.000{col 54}{space 4} .0042411{col 67}{space 3} .0044495
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. reghdfe ln_f_multi_country did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 2,739,581
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res}2395764{txt}){col 67}= {res}   8939.50
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3253
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2285
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0131
+{txt}{col 51}Root MSE{col 67}= {res}    0.0939
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_multi~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .4978891{col 26}{space 2} .0404613{col 37}{space 1}   12.31{col 46}{space 3}0.000{col 54}{space 4} .4185864{col 67}{space 3} .5771918
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2} .0261052{col 26}{space 2} .0001965{col 37}{space 1}  132.82{col 46}{space 3}0.000{col 54}{space 4}   .02572{col 67}{space 3} .0264904
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0046592{col 26}{space 2} .0000554{col 37}{space 1}   84.17{col 46}{space 3}0.000{col 54}{space 4} .0045507{col 67}{space 3} .0047677
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   343803{col 27}{space 1}        0{col 39}{result}{space 1}   343803{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. ppmlhdfe f_multi_country did whether_pat, absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 2524902 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 126530 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 6104 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}8.3312e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.88  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}7.2963e+04 {col 39}{txt}eps = {res}1.42e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.77  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}7.2180e+04 {col 39}{txt}eps = {res}1.08e-02 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.34  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}3.18e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.49  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}1.89e-06 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.49  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}2.24e-10 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.49  {txt} S  
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -5.49  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}7.2157e+04 {col 39}{txt}eps = {res}1.28e-16 {txt}{col 55}{txt}iters = {res}1{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.49  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 27 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    82,045
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    64,282
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      5.83
+{txt}Deviance{col 22}={col 24}{res} 72156.88066{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0158
+{txt}Log pseudolikelihood ={col 24}{res}-68501.25229{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.4876
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_multi_co~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3449986{col 26}{space 2} .1428908{col 37}{space 1}    2.41{col 46}{space 3}0.016{col 54}{space 4} .0649377{col 67}{space 3} .6250594
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .7685975{col 26}{space 2}  .009848{col 37}{space 1}   78.05{col 46}{space 3}0.000{col 54}{space 4} .7492957{col 67}{space 3} .7878993
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    17750{col 27}{space 1}        0{col 39}{result}{space 1}    17750{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Repeat the three specifications using the CEM panel and weights.
+. use ${c -(}stata_output{c )-}DID_allfirm-level_cem.dta, clear
+{txt}
+{com}. 
+. reghdfe f_multi_country_w did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     54.78
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3426
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2501
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0161
+{txt}{col 51}Root MSE{col 67}= {res}    0.2082
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_multi_co~w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0982367{col 26}{space 2} .0290789{col 37}{space 1}    3.38{col 46}{space 3}0.001{col 54}{space 4} .0412431{col 67}{space 3} .1552304
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}  .072156{col 26}{space 2} .0071352{col 37}{space 1}   10.11{col 46}{space 3}0.000{col 54}{space 4} .0581712{col 67}{space 3} .0861408
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0316712{col 26}{space 2} .0037909{col 37}{space 1}    8.35{col 46}{space 3}0.000{col 54}{space 4} .0242411{col 67}{space 3} .0391013
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. 
+. reghdfe ln_f_multi_country did whether_pat [aweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 7 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   711,417
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   2{txt},{res} 623723{txt}){col 67}= {res}     45.89
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.3411
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2485
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0115
+{txt}{col 51}Root MSE{col 67}= {res}    0.2176
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}ln_f_multi~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2312505{col 26}{space 2} .0458425{col 37}{space 1}    5.04{col 46}{space 3}0.000{col 54}{space 4} .1414007{col 67}{space 3} .3211003
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}  .062847{col 26}{space 2} .0078257{col 37}{space 1}    8.03{col 46}{space 3}0.000{col 54}{space 4} .0475089{col 67}{space 3} .0781851
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0320828{col 26}{space 2} .0043485{col 37}{space 1}    7.38{col 46}{space 3}0.000{col 54}{space 4} .0235598{col 67}{space 3} .0406058
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}    87680{col 27}{space 1}        0{col 39}{result}{space 1}    87680{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. 
+. ppmlhdfe f_multi_country did whether_pat [pweight=cem_weights], absorb(firm_id year) vce(r) 
+{res}{txt}(dropped 672296 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}(simplex method dropped 28296 {browse "http://scorreia.com/research/separation.pdf":separated observations})
+{res}{txt}(dropped 1902 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{txt}note: 1 variable omitted because of collinearity: {res}whether_pat{txt}
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}1.0564e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -2.62  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}9.5042e+04 {col 39}{txt}eps = {res}1.11e-01 {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.81  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}9.4366e+04 {col 39}{txt}eps = {res}7.16e-03 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -4.75  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}9.4344e+04 {col 39}{txt}eps = {res}2.35e-04 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.28  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}9.4343e+04 {col 39}{txt}eps = {res}9.70e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.44  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}9.4343e+04 {col 39}{txt}eps = {res}6.04e-08 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -5.45  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}9.4343e+04 {col 39}{txt}eps = {res}3.43e-12 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-07{col 82}{txt} min(eta) = {res} -5.46  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}9.4343e+04 {col 39}{txt}eps = {res}1.32e-16 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res} -5.46  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 28 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}     8,923
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}     6,344
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      3.85
+{txt}Deviance{col 22}={col 24}{res} 94343.21241{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0497
+{txt}Log pseudolikelihood ={col 24}{res}-96556.37704{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.4086
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_multi_co~y{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .3727538{col 26}{space 2} .1899584{col 37}{space 1}    1.96{col 46}{space 3}0.050{col 54}{space 4} .0004423{col 67}{space 3} .7450654
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .4247292{col 26}{space 2} .0546623{col 37}{space 1}    7.77{col 46}{space 3}0.000{col 54}{space 4} .3175931{col 67}{space 3} .5318654
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}     2566{col 27}{space 1}        0{col 39}{result}{space 1}     2566{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. 
+. * Export full-sample and CEM-weighted estimates in one table.
+. esttab M1 M2 M3 M4 M5 M6 using ${c -(}table_output{c )-}multi_coutry_science.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3") ///
+>         mgroups("All sample" "Matched sample", pattern(1 0 0 1 0 0)) ///
+>         nonotes 
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/multi_coutry_science.rtf"'})
+
+{com}. 
+. 
+. 
+. * ==============================================================================
+. * 4. Estimate full-sample effects on geographic-source shares
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. * Model 1: share of cited science from domestic sources.
+. reghdfe f_cite_cn_sci_ratio1 did whether_pat, absorb(firm_id year) vce(r) // Geographic-source share specification.
+{res}{txt}(dropped 207157 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,604
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309154{txt}){col 67}= {res}      8.50
+{txt}{col 51}Prob > F{col 67}= {res}    0.0036
+{txt}{col 51}R-squared{col 67}= {res}    0.4686
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2341
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.2722
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_cn_~1{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0439131{col 26}{space 2} .0150648{col 37}{space 1}    2.91{col 46}{space 3}0.004{col 54}{space 4} .0143866{col 67}{space 3} .0734397
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .1564737{col 26}{space 2} .0004079{col 37}{space 1}  383.61{col 46}{space 3}0.000{col 54}{space 4} .1556743{col 67}{space 3} .1572732
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136437{col 27}{space 1}        0{col 39}{result}{space 1}   136437{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: share of cited science from all foreign sources.
+. reghdfe f_cite_foreign_sci_ratio1 did whether_pat, absorb(firm_id year) vce(r) // Geographic-source share specification.
+{res}{txt}(dropped 207157 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,604
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309154{txt}){col 67}= {res}      4.73
+{txt}{col 51}Prob > F{col 67}= {res}    0.0296
+{txt}{col 51}R-squared{col 67}= {res}    0.4740
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2418
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.1340
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_for~1{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0176234{col 26}{space 2} .0080997{col 37}{space 1}    2.18{col 46}{space 3}0.030{col 54}{space 4} .0017482{col 67}{space 3} .0334986
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .0342204{col 26}{space 2} .0002008{col 37}{space 1}  170.45{col 46}{space 3}0.000{col 54}{space 4} .0338269{col 67}{space 3} .0346139
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136437{col 27}{space 1}        0{col 39}{result}{space 1}   136437{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: share of cited science from U.S. sources.
+. reghdfe f_cite_us_sci_ratio1 did whether_pat, absorb(firm_id year) vce(r) // Geographic-source share specification.
+{res}{txt}(dropped 207157 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,604
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309154{txt}){col 67}= {res}      1.02
+{txt}{col 51}Prob > F{col 67}= {res}    0.3137
+{txt}{col 51}R-squared{col 67}= {res}    0.4196
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1634
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.0785
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_us_~1{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0042039{col 26}{space 2} .0041722{col 37}{space 1}    1.01{col 46}{space 3}0.314{col 54}{space 4}-.0039735{col 67}{space 3} .0123812
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2} .0107032{col 26}{space 2} .0001177{col 37}{space 1}   90.93{col 46}{space 3}0.000{col 54}{space 4} .0104725{col 67}{space 3} .0109339
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136437{col 27}{space 1}        0{col 39}{result}{space 1}   136437{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Model 4: share of cited science from non-U.S. foreign sources.
+. reghdfe f_cite_nonus_foreign_sci_ratio1 did whether_pat, absorb(firm_id year) vce(r) // Geographic-source share specification.
+{res}{txt}(dropped 207157 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}{txt}note: {res}whether_pat{txt} is probably collinear with the fixed effects (all partialled-out values are close to zero; tol = 1.0e-09)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,604
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309154{txt}){col 67}= {res}      3.96
+{txt}{col 51}Prob > F{col 67}= {res}    0.0465
+{txt}{col 51}R-squared{col 67}= {res}    0.4360
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.1871
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.1210
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cite_non~1{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0145704{col 26}{space 2} .0073179{col 37}{space 1}    1.99{col 46}{space 3}0.046{col 54}{space 4} .0002274{col 67}{space 3} .0289133
+{txt}{space 1}whether_pat {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}_cons {c |}{col 14}{res}{space 2}  .026442{col 26}{space 2} .0001813{col 37}{space 1}  145.87{col 46}{space 3}0.000{col 54}{space 4} .0260867{col 67}{space 3} .0267973
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136437{col 27}{space 1}        0{col 39}{result}{space 1}   136437{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. 
+. * Export the four geographic-source share models.
+. esttab M1 M2 M3 M4 using ${c -(}table_output{c )-}compare_source_ratio.rtf, ///
+>         replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>         b(%20.3f) se(%7.3f) r2(%9.3f) drop("whether_pat") ///
+>         stats(N r2, fmt(%15.0fc %9.3f) labels("Observations" "R2")) ///
+>         mtitles("Model 1" "Model 2" "Model 3" "Model 4") ///
+>         nonotes 
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/compare_source_ratio.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\PCS_knowledge_source.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 12:27:03
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

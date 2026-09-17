@@ -1,0 +1,335 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_DID_publicly_listed_firms.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 11:07:29
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS\03_WOS_DID_listed.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: WOS analysis
+> Script:  03_WOS_DID_listed.do
+> 
+> Purpose:
+>   Estimate baseline difference-in-differences (DID) models for Web of Science
+>   publication outcomes among Chinese listed firms. Results compare the full
+>   sample with a coarsened-exact-matching (CEM) sample using level,
+>   log-transformed, and Poisson specifications.
+> 
+> Main inputs:
+>   - ${c -(}stata_output{c )-}CN_WOS_DID_listed.dta (full listed-firm sample)
+>   - ${c -(}stata_output{c )-}CN_WOS_DID_listed_cem.dta (CEM sample and weights)
+> 
+> Main output:
+>   ${c -(}table_output{c )-}WOS_listedfirm.rtf
+> 
+> Required setup:
+>   00_run_all.do defines stata_output and table_output before calling this file.
+>   The global macro $controls must be defined by the calling environment. The
+>   script also requires the community-contributed commands reghdfe, ppmlhdfe,
+>   and esttab.
+> *******************************************************************************/
+. 
+. 
+. 
+. * ==============================================================================
+. * 1. Estimate models for the full listed-firm sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID_listed.dta, clear
+{txt}
+{com}. 
+. global controls cash RDSpendSumRatio ROA AssetLiabilityRatio TobinQ academic_experience
+{txt}
+{com}. 
+. * Model 1: linear specification for winsorized publication counts.
+. reghdfe pub_num_w did $controls, absorb(year firm_id) vce(r)
+{res}{txt}(dropped 42 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    13,780
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}  12701{txt}){col 67}= {res}     10.69
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.6911
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6649
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0076
+{txt}{col 51}Root MSE{col 67}= {res}    1.2487
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}          pub_num_w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2} 1.168294{col 33}{space 2}  .414724{col 44}{space 1}    2.82{col 53}{space 3}0.005{col 61}{space 4} .3553728{col 74}{space 3} 1.981216
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0571268{col 33}{space 2} .0106336{col 44}{space 1}    5.37{col 53}{space 3}0.000{col 61}{space 4} .0362834{col 74}{space 3} .0779703
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0033945{col 33}{space 2} .0032204{col 44}{space 1}    1.05{col 53}{space 3}0.292{col 61}{space 4} -.002918{col 74}{space 3} .0097071
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} .1361276{col 33}{space 2} .1184151{col 44}{space 1}    1.15{col 53}{space 3}0.250{col 61}{space 4}-.0959837{col 74}{space 3}  .368239
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.2875773{col 33}{space 2} .0797158{col 44}{space 1}   -3.61{col 53}{space 3}0.000{col 61}{space 4}-.4438323{col 74}{space 3}-.1313223
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2} .0342718{col 33}{space 2} .0086962{col 44}{space 1}    3.94{col 53}{space 3}0.000{col 61}{space 4} .0172259{col 74}{space 3} .0513177
+{txt}academic_experience {c |}{col 21}{res}{space 2} .1299248{col 33}{space 2} .1200439{col 44}{space 1}    1.08{col 53}{space 3}0.279{col 61}{space 4}-.1053794{col 74}{space 3}  .365229
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} -.203722{col 33}{space 2} .2262459{col 44}{space 1}   -0.90{col 53}{space 3}0.368{col 61}{space 4}-.6471981{col 74}{space 3}  .239754
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}     1060{col 27}{space 1}        1{col 39}{result}{space 1}     1059{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: linear specification for log-transformed publication counts.
+. reghdfe ln_pub_num did $controls, absorb(year firm_id) vce(r)
+{res}{txt}(dropped 42 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    13,780
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}  12701{txt}){col 67}= {res}     10.76
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7430
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.7212
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0072
+{txt}{col 51}Root MSE{col 67}= {res}    0.4425
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}         ln_pub_num{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2} .3969964{col 33}{space 2} .1780637{col 44}{space 1}    2.23{col 53}{space 3}0.026{col 61}{space 4} .0479648{col 74}{space 3}  .746028
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0224689{col 33}{space 2} .0038837{col 44}{space 1}    5.79{col 53}{space 3}0.000{col 61}{space 4} .0148562{col 74}{space 3} .0300816
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0011355{col 33}{space 2}  .001061{col 44}{space 1}    1.07{col 53}{space 3}0.285{col 61}{space 4}-.0009443{col 74}{space 3} .0032153
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} .0494845{col 33}{space 2} .0420795{col 44}{space 1}    1.18{col 53}{space 3}0.240{col 61}{space 4}-.0329976{col 74}{space 3} .1319666
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.0570688{col 33}{space 2} .0280471{col 44}{space 1}   -2.03{col 53}{space 3}0.042{col 61}{space 4}-.1120454{col 74}{space 3}-.0020923
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2} .0111922{col 33}{space 2} .0029359{col 44}{space 1}    3.81{col 53}{space 3}0.000{col 61}{space 4} .0054374{col 74}{space 3} .0169471
+{txt}academic_experience {c |}{col 21}{res}{space 2} .0893935{col 33}{space 2} .0422066{col 44}{space 1}    2.12{col 53}{space 3}0.034{col 61}{space 4} .0066622{col 74}{space 3} .1721247
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} -.064815{col 33}{space 2}  .082313{col 44}{space 1}   -0.79{col 53}{space 3}0.431{col 61}{space 4}-.2261608{col 74}{space 3} .0965308
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}     1060{col 27}{space 1}        1{col 39}{result}{space 1}     1059{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: Poisson specification for publication counts.
+. ppmlhdfe pub_num did $controls, absorb(year firm_id) vce(r)
+{res}{txt}(dropped 42 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}4.5574e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.10  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}2.3103e+04 {col 39}{txt}eps = {res}9.73e-01 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -6.80  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}1.9042e+04 {col 39}{txt}eps = {res}2.13e-01 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -8.48  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}1.8541e+04 {col 39}{txt}eps = {res}2.70e-02 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -9.46  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}1.8511e+04 {col 39}{txt}eps = {res}1.65e-03 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -9.84  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}1.8510e+04 {col 39}{txt}eps = {res}2.24e-05 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -9.91  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}1.8510e+04 {col 39}{txt}eps = {res}6.95e-09 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -9.91  {txt} S  
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}1.8510e+04 {col 39}{txt}eps = {res}1.31e-15 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-06{col 82}{txt} min(eta) = {res} -9.91  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 8 iterations and 21 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    13,780
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}    12,701
+{txt}{col 51}Wald chi2({res}7{txt}){col 67}={col 69}{res}     52.85
+{txt}Deviance{col 22}={col 24}{res} 18510.27772{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0000
+{txt}Log pseudolikelihood ={col 24}{res}-15183.18843{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.9451
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}            pub_num{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      z{col 53}   P>|z|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2}-.0971531{col 33}{space 2} .0933708{col 44}{space 1}   -1.04{col 53}{space 3}0.298{col 61}{space 4}-.2801565{col 74}{space 3} .0858503
+{txt}{space 15}cash {c |}{col 21}{res}{space 2}-.0388115{col 33}{space 2} .0238188{col 44}{space 1}   -1.63{col 53}{space 3}0.103{col 61}{space 4}-.0854956{col 74}{space 3} .0078725
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0358573{col 33}{space 2} .0076407{col 44}{space 1}    4.69{col 53}{space 3}0.000{col 61}{space 4} .0208817{col 74}{space 3} .0508328
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}  .166324{col 33}{space 2} .2653481{col 44}{space 1}    0.63{col 53}{space 3}0.531{col 61}{space 4}-.3537488{col 74}{space 3} .6863967
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.1856244{col 33}{space 2} .1835421{col 44}{space 1}   -1.01{col 53}{space 3}0.312{col 61}{space 4}-.5453602{col 74}{space 3} .1741115
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2}-.0075372{col 33}{space 2} .0113622{col 44}{space 1}   -0.66{col 53}{space 3}0.507{col 61}{space 4}-.0298067{col 74}{space 3} .0147322
+{txt}academic_experience {c |}{col 21}{res}{space 2} 1.123049{col 33}{space 2} .2466735{col 44}{space 1}    4.55{col 53}{space 3}0.000{col 61}{space 4} .6395774{col 74}{space 3}  1.60652
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} 6.146969{col 33}{space 2} .4906054{col 44}{space 1}   12.53{col 53}{space 3}0.000{col 61}{space 4}   5.1854{col 74}{space 3} 7.108538
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}     1060{col 27}{space 1}        1{col 39}{result}{space 1}     1059{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Estimate weighted models for the CEM sample
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}CN_WOS_DID_listed_cem.dta, clear
+{txt}
+{com}. 
+. global controls cash RDSpendSumRatio ROA AssetLiabilityRatio TobinQ academic_experience
+{txt}
+{com}. 
+. keep if cem_matched==1
+{txt}(2,288 observations deleted)
+
+{com}. 
+. * Exclude firms with no publications over the retained panel.
+. bysort firm_id: egen number = sum(pub_num)
+{txt}
+{com}. drop if number == 0
+{txt}(634 observations deleted)
+
+{com}. drop number
+{txt}
+{com}. 
+. * Model 4: CEM-weighted linear specification for winsorized counts.
+. reghdfe pub_num_w did $controls [aweight=cem_weights], absorb(year firm_id) vce(r)
+{res}{txt}(dropped 38 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    10,862
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}   9917{txt}){col 67}= {res}      6.35
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.6673
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6356
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0069
+{txt}{col 51}Root MSE{col 67}= {res}    1.2526
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}          pub_num_w{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2} 1.238991{col 33}{space 2} .4190358{col 44}{space 1}    2.96{col 53}{space 3}0.003{col 61}{space 4} .4175957{col 74}{space 3} 2.060386
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0376187{col 33}{space 2} .0134118{col 44}{space 1}    2.80{col 53}{space 3}0.005{col 61}{space 4} .0113288{col 74}{space 3} .0639085
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0017509{col 33}{space 2} .0033621{col 44}{space 1}    0.52{col 53}{space 3}0.603{col 61}{space 4}-.0048396{col 74}{space 3} .0083413
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} .0536544{col 33}{space 2} .1309674{col 44}{space 1}    0.41{col 53}{space 3}0.682{col 61}{space 4}-.2030683{col 74}{space 3} .3103772
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.2819641{col 33}{space 2} .0969436{col 44}{space 1}   -2.91{col 53}{space 3}0.004{col 61}{space 4}-.4719932{col 74}{space 3} -.091935
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2} .0368493{col 33}{space 2} .0094983{col 44}{space 1}    3.88{col 53}{space 3}0.000{col 61}{space 4} .0182308{col 74}{space 3} .0554678
+{txt}academic_experience {c |}{col 21}{res}{space 2} .2537004{col 33}{space 2} .1377927{col 44}{space 1}    1.84{col 53}{space 3}0.066{col 61}{space 4}-.0164014{col 74}{space 3} .5238021
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} .1876385{col 33}{space 2} .2832313{col 44}{space 1}    0.66{col 53}{space 3}0.508{col 61}{space 4}-.3675523{col 74}{space 3} .7428294
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}      926{col 27}{space 1}        1{col 39}{result}{space 1}      925{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M4
+{txt}
+{com}. 
+. * Model 5: CEM-weighted linear specification for log-transformed counts.
+. reghdfe ln_pub_num did $controls [aweight=cem_weights], absorb(year firm_id) vce(r)
+{res}{txt}(dropped 38 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 6 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}    10,862
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   7{txt},{res}   9917{txt}){col 67}= {res}      7.15
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.7171
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.6902
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0070
+{txt}{col 51}Root MSE{col 67}= {res}    0.4450
+
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}         ln_pub_num{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      t{col 53}   P>|t|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2} .4328587{col 33}{space 2} .1798422{col 44}{space 1}    2.41{col 53}{space 3}0.016{col 61}{space 4} .0803313{col 74}{space 3}  .785386
+{txt}{space 15}cash {c |}{col 21}{res}{space 2} .0170646{col 33}{space 2} .0047406{col 44}{space 1}    3.60{col 53}{space 3}0.000{col 61}{space 4} .0077721{col 74}{space 3} .0263571
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0010408{col 33}{space 2} .0012324{col 44}{space 1}    0.84{col 53}{space 3}0.398{col 61}{space 4} -.001375{col 74}{space 3} .0034567
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2} .0149121{col 33}{space 2} .0477941{col 44}{space 1}    0.31{col 53}{space 3}0.755{col 61}{space 4} -.078774{col 74}{space 3} .1085983
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.0612518{col 33}{space 2} .0332604{col 44}{space 1}   -1.84{col 53}{space 3}0.066{col 61}{space 4}-.1264491{col 74}{space 3} .0039454
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2} .0129008{col 33}{space 2} .0031377{col 44}{space 1}    4.11{col 53}{space 3}0.000{col 61}{space 4} .0067503{col 74}{space 3} .0190513
+{txt}academic_experience {c |}{col 21}{res}{space 2}  .129961{col 33}{space 2}  .049634{col 44}{space 1}    2.62{col 53}{space 3}0.009{col 61}{space 4} .0326684{col 74}{space 3} .2272537
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} .0472633{col 33}{space 2} .0998351{col 44}{space 1}    0.47{col 53}{space 3}0.636{col 61}{space 4}-.1484339{col 74}{space 3} .2429605
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}      926{col 27}{space 1}        1{col 39}{result}{space 1}      925{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M5
+{txt}
+{com}. 
+. * Model 6: CEM-weighted Poisson specification for publication counts.
+. ppmlhdfe pub_num did $controls [pweight=cem_weights], absorb(year firm_id) vce(r)
+{res}{txt}(dropped 38 observations that are either {browse "http://scorreia.com/research/singletons.pdf":singletons} or {browse "http://scorreia.com/research/separation.pdf":separated} by a fixed effect)
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}3.6530e+04 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}5{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -5.31  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}1.7797e+04 {col 39}{txt}eps = {res}1.05e+00 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -7.19  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}1.4208e+04 {col 39}{txt}eps = {res}2.53e-01 {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -9.28  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}1.3747e+04 {col 39}{txt}eps = {res}3.35e-02 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res}-10.71  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}1.3719e+04 {col 39}{txt}eps = {res}2.08e-03 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res}-11.06  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}1.3718e+04 {col 39}{txt}eps = {res}6.20e-05 {txt}{col 55}{txt}iters = {res}3{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res}-11.08  {txt}    
+{txt}{col  0}Iteration 7:{txt}{col 16}deviance = {res}1.3718e+04 {col 39}{txt}eps = {res}8.95e-07 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res}-11.08  {txt}    
+{txt}{col  0}Iteration 8:{txt}{col 16}deviance = {res}1.3718e+04 {col 39}{txt}eps = {res}3.47e-09 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-06{col 82}{txt} min(eta) = {res}-11.08  {txt} S  
+{txt}{col  0}Iteration 9:{txt}{col 16}deviance = {res}1.3718e+04 {col 39}{txt}eps = {res}1.22e-13 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-08{col 82}{txt} min(eta) = {res}-11.08  {txt} S  
+{txt}{col  0}Iteration 10:{txt}{col 16}deviance = {res}1.3718e+04 {col 39}{txt}eps = {res}0.00e+00 {txt}{col 55}{txt}iters = {res}1{col 68}{txt}tol ={res} 1.0e-09{col 82}{txt} min(eta) = {res}-11.08  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 10 iterations and 29 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}    10,862
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}     9,917
+{txt}{col 51}Wald chi2({res}7{txt}){col 67}={col 69}{res}     62.03
+{txt}Deviance{col 22}={col 24}{res} 13717.63731{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.0000
+{txt}Log pseudolikelihood ={col 24}{res}-11571.93349{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.9508
+{txt}{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}{col 33}    Robust
+{col 1}            pub_num{col 21}{c |} Coefficient{col 33}  std. err.{col 45}      z{col 53}   P>|z|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}did {c |}{col 21}{res}{space 2}-.0233969{col 33}{space 2} .1046674{col 44}{space 1}   -0.22{col 53}{space 3}0.823{col 61}{space 4}-.2285413{col 74}{space 3} .1817475
+{txt}{space 15}cash {c |}{col 21}{res}{space 2}-.0493198{col 33}{space 2} .0244537{col 44}{space 1}   -2.02{col 53}{space 3}0.044{col 61}{space 4}-.0972483{col 74}{space 3}-.0013914
+{txt}{space 4}RDSpendSumRatio {c |}{col 21}{res}{space 2} .0449608{col 33}{space 2} .0084125{col 44}{space 1}    5.34{col 53}{space 3}0.000{col 61}{space 4} .0284726{col 74}{space 3} .0614489
+{txt}{space 16}ROA {c |}{col 21}{res}{space 2}-.4871344{col 33}{space 2} .3210788{col 44}{space 1}   -1.52{col 53}{space 3}0.129{col 61}{space 4}-1.116437{col 74}{space 3} .1421685
+{txt}AssetLiabilityRatio {c |}{col 21}{res}{space 2}-.2124288{col 33}{space 2}  .195829{col 44}{space 1}   -1.08{col 53}{space 3}0.278{col 61}{space 4}-.5962466{col 74}{space 3}  .171389
+{txt}{space 13}TobinQ {c |}{col 21}{res}{space 2} .0180461{col 33}{space 2} .0102927{col 44}{space 1}    1.75{col 53}{space 3}0.080{col 61}{space 4}-.0021273{col 74}{space 3} .0382194
+{txt}academic_experience {c |}{col 21}{res}{space 2} 1.244453{col 33}{space 2} .2460891{col 44}{space 1}    5.06{col 53}{space 3}0.000{col 61}{space 4} .7621272{col 74}{space 3} 1.726779
+{txt}{space 14}_cons {c |}{col 21}{res}{space 2} 6.641471{col 33}{space 2}  .506584{col 44}{space 1}   13.11{col 53}{space 3}0.000{col 61}{space 4} 5.648585{col 74}{space 3} 7.634358
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text} firm_id_wos{col 14}{c |}{space 1}      926{col 27}{space 1}        1{col 39}{result}{space 1}      925{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M6
+{txt}
+{com}. 
+. * ==============================================================================
+. * 3. Export the full-sample and matched-sample estimates
+. * ==============================================================================
+. 
+. esttab M1 M2 M3 M4 M5 M6 using ${c -(}table_output{c )-}WOS_listedfirm.rtf, ///
+>     replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>     b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>     stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>     mtitles("Model 1" "Model 2" "Model 3" "Model 4" "Model 5" "Model 6") ///
+>     nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../table_output/WOS/WOS_listedfirm.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_DID_publicly_listed_firms.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 11:07:37
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

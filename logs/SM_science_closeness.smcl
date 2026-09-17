@@ -1,0 +1,126 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_science_closeness.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 14:21:38
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat\3_Supplementary_materials\F1_Alternative_outcome\02_Science_closeness.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Science-linked patents—supplementary alternative outcomes
+> Script:  02_Science_closeness.do
+> 
+> Purpose:
+>   Estimate the sanction effect using firms' maximum closeness to CNKI and WOS
+>   publications as alternative outcomes. Both specifications include firm and
+>   year fixed effects with robust standard errors.
+> 
+> Main input (from ${c -(}stata_output{c )-}):
+>   - DID_allfirm-level.dta
+> 
+> Main output (under ${c -(}table_output{c )-}):
+>   - science_closeness.rtf: CNKI and WOS closeness estimates
+> 
+> Notes:
+>   Run through 3_Supplementary_materials/00_run_all.do so the shared path globals
+>   are available.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Estimate the model using maximum closeness to CNKI publications
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. 
+. reghdfe f_cnki_closeness_max did, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 207145 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 9 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,368
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 308979{txt}){col 67}= {res}     15.90
+{txt}{col 51}Prob > F{col 67}= {res}    0.0001
+{txt}{col 51}R-squared{col 67}= {res}    0.4978
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2762
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0000
+{txt}{col 51}Root MSE{col 67}= {res}    0.1116
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_cnki_clo~x{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2}  .028063{col 26}{space 2} .0070388{col 37}{space 1}    3.99{col 46}{space 3}0.000{col 54}{space 4} .0142671{col 67}{space 3} .0418589
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .5918795{col 26}{space 2} .0001673{col 37}{space 1} 3537.56{col 46}{space 3}0.000{col 54}{space 4} .5915516{col 67}{space 3} .5922074
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136376{col 27}{space 1}        0{col 39}{result}{space 1}   136376{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. * ==============================================================================
+. * 2. Estimate the model using maximum closeness to WOS publications
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}DID_allfirm-level.dta, clear
+{txt}
+{com}. reghdfe f_wos_closeness_max did, absorb(firm_id year) vce(r)
+{res}{txt}(dropped 207133 {browse "http://scorreia.com/research/singletons.pdf":singleton observations})
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 8 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res}   445,479
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res} 309062{txt}){col 67}= {res}     24.76
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4798
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.2501
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0001
+{txt}{col 51}Root MSE{col 67}= {res}    0.1042
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}f_wos_clos~x{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0329593{col 26}{space 2} .0066235{col 37}{space 1}    4.98{col 46}{space 3}0.000{col 54}{space 4} .0199775{col 67}{space 3} .0459412
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .5491328{col 26}{space 2} .0001562{col 37}{space 1} 3515.06{col 46}{space 3}0.000{col 54}{space 4} .5488266{col 67}{space 3}  .549439
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}     firm_id{col 14}{c |}{space 1}   136404{col 27}{space 1}        0{col 39}{result}{space 1}   136404{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        1{col 39}{result}{space 1}       12{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. * ==============================================================================
+. * 3. Export the combined science-closeness table
+. * ==============================================================================
+. 
+. esttab M1 M2 using ${c -(}table_output{c )-}science_closeness.rtf, ///
+>     replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress ///
+>     b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>     stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>     mtitles("Model 1" "Model 2") ///
+>     nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Sci_Pat/../../table_output/CN_CN/science_closeness.rtf"'})
+
+{com}. 
+. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\SM_science_closeness.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 14:21:53
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

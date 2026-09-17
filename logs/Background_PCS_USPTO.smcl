@@ -1,0 +1,325 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\Background_PCS_USPTO.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 09:56:41
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Background\PCS_USPTO.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Background figures
+> Script:  PCS_USPTO.do
+> 
+> Purpose:
+>   Create a grant-year figure for U.S. patents filed by Chinese firms. The
+>   figure reports the annual number of patents linked to scientific papers and
+>   their share of all U.S. patents filed by Chinese firms for 2010-2022.
+> 
+> Main inputs:
+>   - ${c -(}PCS{c )-}_pcs_oa.csv (patent-to-paper citation links)
+>   - ${c -(}stata_output{c )-}USpatents_filedby_CNfirms.dta (filing-firm classification)
+>   - ${c -(}USpatents_stata{c )-}USpatents_appyr.dta (application years)
+>   - ${c -(}USpatents_stata{c )-}USpatents_grtyr.dta (grant years)
+> 
+> Intermediate file:
+>   ${c -(}temp_output{c )-}temp_plot.dta (created during processing and removed at the end)
+> 
+> Main output:
+>   ${c -(}figure_output{c )-}time_trend_CNfirm_USPTO.gph
+> 
+> Required setup:
+>   00_run_all.do defines PCS, stata_output, USpatents_stata, temp_output, and
+>   figure_output before calling this file.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Assemble the U.S. patent-level analysis file
+. * ==============================================================================
+. 
+. * Import patent-to-paper citation links and retain U.S. patents.
+. import delimited ${c -(}PCS{c )-}_pcs_oa.csv, clear
+{res}{txt}(encoding automatically selected: ISO-8859-1)
+{res}{text}(7 vars, 47,844,586 obs)
+
+{com}. gen pat_country = substr(patent, 1, 2)
+{txt}
+{com}. keep if pat_country == "us"
+{txt}(13,445,019 observations deleted)
+
+{com}. gen patent_id = regexs(1) if regexm(patent, "-([0-9]+)-")
+{txt}(232,085 missing values generated)
+
+{com}. 
+. keep patent_id
+{txt}
+{com}. duplicates drop
+
+{p 0 4}{txt}Duplicates in terms of {txt} all variables{p_end}
+
+(31,436,748 observations deleted)
+
+{com}. gen cite_science = 1
+{txt}
+{com}. 
+. * Merge filing-firm classifications and retain patents filed by Chinese firms.
+. merge m:1 patent_id using ${c -(}stata_output{c )-}USpatents_filedby_CNfirms.dta // Match codes distinguish citation-only records, firm-only records, and matched records.
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}       3,150,411
+{txt}{col 9}from master{col 30}{res}       2,924,269{txt}  (_merge==1)
+{col 9}from using{col 30}{res}         226,142{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}          38,550{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop if _merge == 1
+{txt}(2,924,269 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. replace cite_science = 0 if cite_science == .
+{txt}(226,142 real changes made)
+
+{com}. 
+. * Attach application years; exclude year records not present in the patent sample.
+. merge m:1 patent_id using ${c -(}USpatents_stata{c )-}USpatents_appyr.dta
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}       9,187,210
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}       9,187,210{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}         264,692{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop if _merge == 2
+{txt}(9,187,210 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. 
+. * Attach grant years; exclude year records not present in the patent sample.
+. merge m:1 patent_id using ${c -(}USpatents_stata{c )-}USpatents_grtyr.dta
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}       9,189,469
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}       9,189,469{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}         264,692{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop if _merge == 2
+{txt}(9,189,469 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. 
+. * Save the assembled patent-level data for both annual aggregations below.
+. save ${c -(}temp_output{c )-}temp_plot.dta, replace
+{txt}{p 0 4 2}
+(file {bf}
+../../temp_output/CN_CN/temp_plot.dta{rm}
+not found)
+{p_end}
+{p 0 4 2}
+file {bf}
+../../temp_output/CN_CN/temp_plot.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. * ==============================================================================
+. * 2. Construct application-year and grant-year series
+. * ==============================================================================
+. 
+. * Aggregate patent counts and science-linked shares by application year.
+. use ${c -(}temp_output{c )-}temp_plot.dta, clear
+{txt}
+{com}. rename appyr year
+{res}{txt}
+{com}. 
+. bys year: gen patent_appyr = _N
+{txt}
+{com}. bys year: egen sci_reliant_patent_appyr = sum(cite_science)
+{txt}
+{com}. 
+. keep year sci_reliant_patent_appyr patent_appyr
+{txt}
+{com}. duplicates drop
+
+{p 0 4}{txt}Duplicates in terms of {txt} all variables{p_end}
+
+(264,639 observations deleted)
+
+{com}. gen sci_reliant_ratio_appyr = sci_reliant_patent_appyr / patent_appyr
+{txt}
+{com}. keep if year >= 2000 & year <= 2022
+{txt}(30 observations deleted)
+
+{com}. 
+. tempfile data1
+{txt}
+{com}. save `data1'
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_29d0_000001.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. * Aggregate patent counts and science-linked shares by grant year.
+. use ${c -(}temp_output{c )-}temp_plot.dta, clear
+{txt}
+{com}. rename grtyr year
+{res}{txt}
+{com}. 
+. bys year: gen patent_grtyr = _N
+{txt}
+{com}. bys year: egen sci_reliant_patent_grtyr = sum(cite_science)
+{txt}
+{com}. 
+. keep year sci_reliant_patent_grtyr patent_grtyr
+{txt}
+{com}. duplicates drop
+
+{p 0 4}{txt}Duplicates in terms of {txt} all variables{p_end}
+
+(264,642 observations deleted)
+
+{com}. gen sci_reliant_ratio_grtyr = sci_reliant_patent_grtyr / patent_grtyr
+{txt}
+{com}. keep if year >= 2000 & year <= 2022
+{txt}(27 observations deleted)
+
+{com}. 
+. tempfile data2
+{txt}
+{com}. save `data2'
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\Mark\AppData\Local\Temp\ST_29d0_000002.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. * Combine both annual series; the figure below uses the grant-year measures.
+. use `data1', clear
+{txt}
+{com}. merge 1:1 year using `data2'
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}               0
+{txt}{col 5}Matched{col 30}{res}              23{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. 
+. * ==============================================================================
+. * 3. Prepare endpoint labels for the figure
+. * ==============================================================================
+. 
+. * Create separate endpoint indicators so labels can be positioned independently.
+. gen byte ep2010 = (year == 2010)
+{txt}
+{com}. gen byte ep2022 = (year == 2022)
+{txt}
+{com}. 
+. * Format labels for the count and share series.
+. gen str num_label = string(sci_reliant_patent_grtyr, "%9.0fc")
+{txt}
+{com}. gen str pct_label = string(sci_reliant_ratio_grtyr * 100, "%9.2f") + "%"
+{txt}
+{com}. 
+. * Shift label coordinates slightly inward to reduce overlap at plot boundaries.
+. gen double year_lbl_1 = year
+{txt}
+{com}. replace year_lbl_1 = year + 0.50 if year == 2010
+{txt}(1 real change made)
+
+{com}. replace year_lbl_1 = year - 0.50 if year == 2022
+{txt}(1 real change made)
+
+{com}. 
+. gen double year_lbl_2 = year
+{txt}
+{com}. replace year_lbl_2 = year + 0.20 if year == 2010
+{txt}(1 real change made)
+
+{com}. replace year_lbl_2 = year - 0.20 if year == 2022
+{txt}(1 real change made)
+
+{com}. 
+. * ==============================================================================
+. * 4. Plot annual patent trends
+. * ==============================================================================
+. 
+. * Draw count and share series; marker-only layers supply the endpoint labels.
+. twoway ///
+>     (connected sci_reliant_patent_grtyr year, ///
+>         yaxis(1) lwidth(medium) lcolor(red*1.5) lpattern(solid) ///
+>         msymbol(square) mcolor(red*1.5)) || ///
+>     (connected sci_reliant_ratio_grtyr year, ///
+>         yaxis(2) lwidth(medium) lcolor(ebblue*1.5) lpattern(dash) ///
+>         msymbol(circle) mcolor(ebblue*1.5)) || ///
+>     /* Left-axis series: 2010 endpoint label */ ///
+>     (scatter sci_reliant_patent_grtyr year_lbl_2 if ep2010, ///
+>         yaxis(1) msymbol(none) ///
+>         mlabel(num_label) mlabposition(6) mlabgap(0) ///
+>         mlabsize(medium) mlabcolor(red*1.5)) || ///
+>     /* Left-axis series: 2022 endpoint label */ ///
+>     (scatter sci_reliant_patent_grtyr year_lbl_2 if ep2022, ///
+>         yaxis(1) msymbol(none) ///
+>         mlabel(num_label) mlabposition(9) mlabgap(-1) ///
+>         mlabsize(medium) mlabcolor(red*1.5)) || ///
+>     /* Right-axis series: 2010 endpoint label */ ///
+>     (scatter sci_reliant_ratio_grtyr year_lbl_1 if ep2010, ///
+>         yaxis(2) msymbol(none) ///
+>         mlabel(pct_label) mlabposition(6) mlabgap(1) ///
+>         mlabsize(medium) mlabcolor(ebblue*1.5)) || ///
+>     /* Right-axis series: 2022 endpoint label */ ///
+>     (scatter sci_reliant_ratio_grtyr year_lbl_1 if ep2022, ///
+>         yaxis(2) msymbol(none) ///
+>         mlabel(pct_label) mlabposition(12) mlabgap(1) ///
+>         mlabsize(medium) mlabcolor(ebblue*1.5)) ///
+>     if year >= 2010, ///
+>     ytitle("{c -(}bf:Number of science-linked U.S. patents{c )-}" ///
+>         "{c -(}bf:filed by Chinese firms{c )-}", axis(1) size(medium)) ///
+>     ytitle("{c -(}bf:Share of science-linked U.S. patents{c )-}" ///
+>         "{c -(}bf:filed by Chinese firms{c )-}", axis(2) size(medium)) ///
+>     ylabel(, axis(1) labsize(medsmall) format(%9.0f)) ///
+>     ylabel(0 0.1 "10%" 0.2 "20%" 0.3 "30%" 0.4 "40%", axis(2) labsize(medsmall)) ///
+>     xtitle("{c -(}bf:Patent grant year{c )-}", size(medium) placement(east)) ///
+>     xlabel(2010(1)2022, angle(45) labsize(medsmall)) ///
+>         legend(order(1 "Number (left)" 4 "Ratio (right)") size(medium) position(11) ring(0) row(1)) /// legend(off) 
+>     graphregion(margin(vsmall))
+{res}{txt}
+{com}. 
+. * ==============================================================================
+. * 5. Save the graph and remove the intermediate file
+. * ==============================================================================
+. 
+. graph save ${c -(}figure_output{c )-}time_trend_CNfirm_USPTO.gph, replace
+{res}{txt}file {bf:../../figure_output/CN_CN/time_trend_CNfirm_USPTO.gph} saved
+
+{com}. 
+. * Delete the on-disk intermediate; Stata-managed tempfiles are removed automatically.
+. erase ${c -(}temp_output{c )-}temp_plot.dta
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\Background_PCS_USPTO.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 10:00:23
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

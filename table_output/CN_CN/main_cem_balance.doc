@@ -1,0 +1,210 @@
+{\rtf1\ansi\deff0 {\fonttbl{\f0\fnil Garamond;}}
+{\info {\author .}{\company .}{\title .}}
+\deflang1033\plain\fs20
+{\footer\pard\qc\plain\f0\fs20\chpgn\par}
+{
+{\b\qc\line Balance: Pre- vs Post-Matching }{\par}
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx2000
+\fs20 \pard\intbl \qr { Variable}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx3080
+\fs20 \pard\intbl \qr { Group}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx4080
+\fs20 \pard\intbl \qr { pre_mean}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx5080
+\fs20 \pard\intbl \qr { pre_se}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx7080
+\fs20 \pard\intbl \qr { pre_ci}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx8080
+\fs20 \pard\intbl \qr { post_mean}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx9080
+\fs20 \pard\intbl \qr { post_se}\cell
+\clbrdrt\brdrw10\brdrs \clbrdrb\brdrw25\brdrs \cellx11080
+\fs20 \pard\intbl \qr { post_ci}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Log (number of patents filed before listing+1)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Control}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    0.353}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.000}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[0.352, 0.353]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.977}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.013}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.951, 1.003]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Log (number of patents filed before listing+1)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Treatment}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    1.433}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.023}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[1.388, 1.478]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.980}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.019}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.943, 1.017]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Log (Prior scientific foundations+1)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Control}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    0.075}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.000}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[0.075, 0.076]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.375}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.009}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.358, 0.391]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Log (Prior scientific foundations+1)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Treatment}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    0.650}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.015}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[0.621, 0.679]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.384}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.011}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.363, 0.405]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Firm ownership (SOEs=1, non-SOEs=0)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Control}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    0.048}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.000}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[0.048, 0.049]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.348}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.006}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.337, 0.359]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Firm ownership (SOEs=1, non-SOEs=0)}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Treatment}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {    0.430}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.009}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[0.413, 0.447]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {    0.348}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.010}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[0.329, 0.367]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Industry id}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Control}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {  311.296}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.114}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[311.073, 311.519]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {  447.090}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    1.430}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[444.288, 449.892]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Industry id}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Treatment}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {  449.275}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    2.896}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[443.598, 454.951]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {  446.257}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    3.310}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[439.768, 452.745]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Province id}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Control}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {   36.014}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.008}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[35.999, 36.029]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {   34.552}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.163}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[34.233, 34.871]}\cell
+\row}
+{\trowd\trgaph108\trleft-108
+\cellx2000
+\fs20 \pard\intbl \ql { Province id}\cell
+\cellx3080
+\fs20 \pard\intbl \ql {Treatment}\cell
+\cellx4080
+\fs20 \pard\intbl \qr {   34.699}\cell
+\cellx5080
+\fs20 \pard\intbl \qr {    0.291}\cell
+\cellx7080
+\fs20 \pard\intbl \ql {[34.129, 35.269]}\cell
+\cellx8080
+\fs20 \pard\intbl \qr {   34.433}\cell
+\cellx9080
+\fs20 \pard\intbl \qr {    0.345}\cell
+\cellx11080
+\fs20 \pard\intbl \ql {[33.757, 35.109]}\cell
+\row}
+
+
+\writepositionforappend
+{\trowd\trgaph108\trleft-108
+\clbrdrt\brdrw15\brdrs\cellx11080 \cell
+\row}}}

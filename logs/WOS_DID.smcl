@@ -1,0 +1,130 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 11:20:15
+
+{com}. do "C:\Users\Mark\AppData\Local\Temp\STD2fd4_00000e.tmp"
+{txt}
+{com}. use ${c -(}stata_output{c )-}CN_WOS_DID.dta, clear
+{txt}
+{com}. 
+. * Model 1: linear specification for winsorized publication counts.
+. reghdfe pub_num_w did, absorb(year firm_id) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,153,256
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}1064531{txt}){col 67}= {res}     86.14
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4923
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.4499
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0002
+{txt}{col 51}Root MSE{col 67}= {res}    0.7103
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}   pub_num_w{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .2805476{col 26}{space 2} .0302273{col 37}{space 1}    9.28{col 46}{space 3}0.000{col 54}{space 4} .2213031{col 67}{space 3}  .339792
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .2601856{col 26}{space 2} .0006629{col 37}{space 1}  392.52{col 46}{space 3}0.000{col 54}{space 4} .2588864{col 67}{space 3} .2614847
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    88712{col 27}{space 1}        1{col 39}{result}{space 1}    88711{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M1
+{txt}
+{com}. 
+. * Model 2: linear specification for log-transformed publication counts.
+. reghdfe ln_pub_num did, absorb(year firm_id) vce(r)
+{res}{txt}({browse "http://scorreia.com/research/hdfe.pdf":MWFE estimator} converged in 2 iterations)
+{res}
+{txt}HDFE Linear regression{col 51}Number of obs{col 67}= {res} 1,153,256
+{txt}Absorbing 2 HDFE groups{col 51}F({res}   1{txt},{res}1064531{txt}){col 67}= {res}    101.53
+{txt}{col 51}Prob > F{col 67}= {res}    0.0000
+{txt}{col 51}R-squared{col 67}= {res}    0.4385
+{txt}{col 51}Adj R-squared{col 67}= {res}    0.3918
+{txt}{col 51}Within R-sq.{col 67}= {res}    0.0002
+{txt}{col 51}Root MSE{col 67}= {res}    0.3084
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}  ln_pub_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .1230917{col 26}{space 2}  .012216{col 37}{space 1}   10.08{col 46}{space 3}0.000{col 54}{space 4} .0991488{col 67}{space 3} .1470346
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1330948{col 26}{space 2} .0002877{col 37}{space 1}  462.67{col 46}{space 3}0.000{col 54}{space 4}  .132531{col 67}{space 3} .1336586
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    88712{col 27}{space 1}        1{col 39}{result}{space 1}    88711{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M2
+{txt}
+{com}. 
+. * Model 3: Poisson specification for publication counts.
+. ppmlhdfe pub_num did, absorb(year firm_id) vce(r)
+{res}{txt}{col  0}Iteration 1:{txt}{col 16}deviance = {res}8.2796e+05 {col 39}{txt}eps = {res}.        {txt}{col 55}{txt}iters = {res}4{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.16  {txt}P   
+{txt}{col  0}Iteration 2:{txt}{col 16}deviance = {res}7.1192e+05 {col 39}{txt}eps = {res}1.63e-01 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.60  {txt}    
+{txt}{col  0}Iteration 3:{txt}{col 16}deviance = {res}7.0226e+05 {col 39}{txt}eps = {res}1.38e-02 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.77  {txt}    
+{txt}{col  0}Iteration 4:{txt}{col 16}deviance = {res}7.0198e+05 {col 39}{txt}eps = {res}3.91e-04 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.80  {txt}    
+{txt}{col  0}Iteration 5:{txt}{col 16}deviance = {res}7.0198e+05 {col 39}{txt}eps = {res}3.54e-06 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-04{col 82}{txt} min(eta) = {res} -3.80  {txt}    
+{txt}{col  0}Iteration 6:{txt}{col 16}deviance = {res}7.0198e+05 {col 39}{txt}eps = {res}4.41e-09 {txt}{col 55}{txt}iters = {res}2{col 68}{txt}tol ={res} 1.0e-05{col 82}{txt} min(eta) = {res} -3.80  {txt} S O
+{txt}{hline 108}
+{txt}(legend: {res}p{txt}: exact partial-out   {res}s{txt}: exact solver   {res}h{txt}: step-halving   {res}o{txt}: epsilon below tolerance)
+{txt}Converged in 6 iterations and 14 HDFE sub-iterations (tol = 1.0e-08)
+{res}{txt}
+HDFE {help ppmlhdfe##description:PPML} regression{col 51}No. of obs{col 67}={col 69}{res}   1153256
+{txt}Absorbing 2 HDFE groups{col 51}Residual df{col 67}={col 69}{res}   1064531
+{txt}{col 51}Wald chi2({res}1{txt}){col 67}={col 69}{res}      0.18
+{txt}Deviance{col 22}={col 24}{res} 701981.4012{txt}{col 51}Prob > chi2{col 67}={col 69}{res}    0.6701
+{txt}Log pseudolikelihood ={col 24}{res}-536193.1609{txt}{col 51}Pseudo R2{col 67}={col 69}{res}    0.3915
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     pub_num{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}did {c |}{col 14}{res}{space 2} .0191402{col 26}{space 2} .0449292{col 37}{space 1}    0.43{col 46}{space 3}0.670{col 54}{space 4}-.0689194{col 67}{space 3} .1071998
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.1968622{col 26}{space 2} .0024505{col 37}{space 1}  -80.34{col 46}{space 3}0.000{col 54}{space 4} -.201665{col 67}{space 3}-.1920593
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}Absorbed degrees of freedom:
+{res}{col 1}{text}{hline 13}{c TT}{hline 12}{hline 12}{hline 14}{hline 1}{c TRC}
+{col 1}{text} Absorbed FE{col 14}{c |} Categories{col 27} - Redundant{col 39}  = Num. Coefs{col 54}{c |}
+{res}{col 1}{text}{hline 13}{c +}{hline 12}{hline 12}{hline 14}{hline 1}{c RT}
+{col 1}{text}        year{col 14}{c |}{space 1}       13{col 27}{space 1}        0{col 39}{result}{space 1}       13{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}     firm_id{col 14}{c |}{space 1}    88712{col 27}{space 1}        1{col 39}{result}{space 1}    88711{col 53}{text} {col 54}{c |}
+{res}{col 1}{text}{hline 13}{c BT}{hline 12}{hline 12}{hline 14}{hline 1}{c BRC}
+{res}{txt}
+{com}. est store M3
+{txt}
+{com}. 
+. * Export the three stored specifications as one regression table.
+. esttab M1 M2 M3 using ${c -(}table_output{c )-}WOS.rtf, ///
+>     replace star( * 0.10 ** 0.05 *** 0.01 ) nogaps compress order(did) ///
+>     b(%20.3f) se(%7.3f) r2(%9.3f) ///
+>     stats(N r2 r2_p, fmt(%15.0fc %9.3f %9.3f) labels("Observations" "R2" "Pseudo R2")) ///
+>     mtitles("pub_num" "pub_num" "pub_num") ///
+>     nonotes
+{res}{txt}(output written to {browse  `"W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\WOS/../../table_output/WOS/WOS.rtf"'})
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\WOS_DID.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 11:20:43
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

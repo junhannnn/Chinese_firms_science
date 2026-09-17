@@ -1,0 +1,183 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\Background_PCS_CNIPA.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 5 Sep 2026, 09:53:57
+
+{com}. do "W:\Mac_Sync\Desktop\public_release_science_20260904\analytics\Background\PCS_CNIPA.do"
+{txt}
+{com}. /*******************************************************************************
+> Project: Background figures
+> Script:  PCS_CNIPA.do
+> 
+> Purpose:
+>   Create a 2010-2022 grant-year figure for Chinese patents filed by Chinese
+>   firms. The figure reports the annual number of patents linked to scientific
+>   papers and their share of all patents in the analysis sample.
+> 
+> Main input:
+>   ${c -(}stata_output{c )-}Chinese_patents_filed_by_EL_otherfirms.dta
+> 
+> Main output:
+>   ${c -(}figure_output{c )-}time_trend_CNfirm_CNIPA.gph
+> 
+> Required setup:
+>   00_run_all.do defines stata_output and figure_output before calling this file.
+> *******************************************************************************/
+. 
+. * ==============================================================================
+. * 1. Load the Chinese patent-level data
+. * ==============================================================================
+. 
+. use ${c -(}stata_output{c )-}Chinese_patents_filed_by_EL_otherfirms.dta, clear
+{txt}
+{com}. rename grtyr year
+{res}{txt}
+{com}. 
+. * ==============================================================================
+. * 2. Construct annual patent measures
+. * ==============================================================================
+. 
+. * Count all patents and science-linked patents within each grant year.
+. bys year: gen patent_grtyr = _N
+{txt}
+{com}. bys year: egen sci_reliant_patent_grtyr = sum(cite_science)
+{txt}
+{com}. 
+. * Count distinct filing firms within each grant year.
+. bys year (fapp_standard): gen firm_tag = fapp_standard
+{txt}
+{com}. bys year: egen unique_firm_yr = total(firm_tag != firm_tag[_n-1])
+{txt}
+{com}. 
+. * Count distinct firms with at least one science-linked patent in each year.
+. bysort year fapp_standard: egen has_citesci = max(cite_science)
+{txt}
+{com}. bysort year fapp_standard: gen tag = has_citesci if _n == 1   // Marks one firm-year record; its value indicates any science link.
+{txt}(3,300,705 missing values generated)
+
+{com}. bysort year: egen unique_citesci_firm_yr = total(tag)
+{txt}
+{com}. 
+. * Collapse to one record per year before deriving shares and per-firm averages.
+. keep year sci_reliant_patent_grtyr unique_firm_yr unique_citesci_firm_yr patent_grtyr
+{txt}
+{com}. duplicates drop
+
+{p 0 4}{txt}Duplicates in terms of {txt} all variables{p_end}
+
+(4,433,765 observations deleted)
+
+{com}. 
+. gen sci_reliant_ratio_grtyr = sci_reliant_patent_grtyr / patent_grtyr
+{txt}
+{com}. 
+. gen sci_reliant_patent_grtyr_adj1 = sci_reliant_patent_grtyr / unique_firm_yr
+{txt}
+{com}. gen sci_reliant_patent_grtyr_adj2 = sci_reliant_patent_grtyr / unique_citesci_firm_yr
+{txt}(15 missing values generated)
+
+{com}. 
+. keep if year >= 2010 & year <= 2022
+{txt}(28 observations deleted)
+
+{com}. 
+. * ==============================================================================
+. * 3. Prepare endpoint labels for the figure
+. * ==============================================================================
+. 
+. * Create separate endpoint indicators so labels can be positioned independently.
+. gen byte ep2010 = (year == 2010)
+{txt}
+{com}. gen byte ep2022 = (year == 2022)
+{txt}
+{com}. 
+. * Format labels for the count and share series.
+. gen str num_label = string(sci_reliant_patent_grtyr, "%9.0fc")
+{txt}
+{com}. gen str pct_label = string(sci_reliant_ratio_grtyr * 100, "%9.2f") + "%"
+{txt}
+{com}. 
+. * Shift label coordinates slightly inward to reduce overlap at plot boundaries.
+. gen double year_lbl_1 = year
+{txt}
+{com}. replace year_lbl_1 = year + 0.50 if year == 2010
+{txt}(1 real change made)
+
+{com}. replace year_lbl_1 = year - 0.50 if year == 2022
+{txt}(1 real change made)
+
+{com}. 
+. gen double year_lbl_2 = year
+{txt}
+{com}. replace year_lbl_2 = year + 0.20 if year == 2010
+{txt}(1 real change made)
+
+{com}. replace year_lbl_2 = year - 0.20 if year == 2022
+{txt}(1 real change made)
+
+{com}. 
+. * ==============================================================================
+. * 4. Plot annual patent trends
+. * ==============================================================================
+. 
+. * Draw count and share series; marker-only layers supply the endpoint labels.
+. twoway ///
+>     (connected sci_reliant_patent_grtyr year, ///
+>         yaxis(1) lwidth(medium) lcolor(red*1.4) lpattern(solid) ///
+>         msymbol(square) mcolor(red*1.5)) || ///
+>     (connected sci_reliant_ratio_grtyr year, ///
+>         yaxis(2) lwidth(medium) lcolor(ebblue*1.2) lpattern(dash) ///
+>         msymbol(circle) mcolor(ebblue*1.5)) || ///
+>     /* Left axis: 2010 endpoint label */ ///
+>     (scatter sci_reliant_patent_grtyr year_lbl_1 if ep2010, ///
+>         yaxis(1) msymbol(none) ///
+>         mlabel(num_label) mlabposition(6) mlabgap(0) ///
+>         mlabsize(medium) mlabcolor(red*1.5)) || ///
+>     /* Left axis: 2022 endpoint label */ ///
+>     (scatter sci_reliant_patent_grtyr year_lbl_2 if ep2022, ///
+>         yaxis(1) msymbol(none) ///
+>         mlabel(num_label) mlabposition(11) mlabgap(-1) ///
+>         mlabsize(medium) mlabcolor(red*1.5)) || ///
+>     /* Right axis: 2010 endpoint label */ ///
+>     (scatter sci_reliant_ratio_grtyr year_lbl_1 if ep2010, ///
+>         yaxis(2) msymbol(none) ///
+>         mlabel(pct_label) mlabposition(6) mlabgap(1) ///
+>         mlabsize(medium) mlabcolor(ebblue*1.5)) || ///
+>     /* Right axis: 2022 endpoint label */ ///
+>     (scatter sci_reliant_ratio_grtyr year_lbl_1 if ep2022, ///
+>         yaxis(2) msymbol(none) ///
+>         mlabel(pct_label) mlabposition(12) mlabgap(1) ///
+>         mlabsize(medium) mlabcolor(ebblue*1.5)), ///
+>     ytitle("{c -(}bf:Number of science-linked Chinese patents{c )-}" ///
+>         "{c -(}bf:filed by Chinese firms{c )-}", axis(1) size(medium)) ///
+>     ytitle("{c -(}bf:Share of science-linked Chinese patents{c )-}" ///
+>         "{c -(}bf:filed by Chinese firms{c )-}", axis(2) size(medium)) ///
+>     ylabel(, axis(1) labsize(medsmall) format(%9.0f)) ///
+>     ylabel(0 0.1 "10%" 0.2 "20%" 0.3 "30%" 0.4 "40%", ///
+>         axis(2) labsize(medsmall)) ///
+>     xtitle("{c -(}bf:Patent grant year{c )-}", size(medium) placement(east)) ///
+>     xlabel(2010(1)2022, angle(45) labsize(medsmall)) ///
+>         legend(order(1 "Number (left)" 4 "Ratio (right)") size(medium) position(11) ring(0) row(1)) /// legend(off)
+>     graphregion(margin(vsmall))
+{res}{txt}
+{com}. 
+. * ==============================================================================
+. * 5. Save the graph
+. * ==============================================================================
+. 
+. graph save ${c -(}figure_output{c )-}time_trend_CNfirm_CNIPA.gph, replace
+{res}{txt}file {bf:../../figure_output/CN_CN/time_trend_CNfirm_CNIPA.gph} saved
+
+{com}. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}W:\Mac_Sync\Desktop\public_release_science_20260904\logs\Background_PCS_CNIPA.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 5 Sep 2026, 09:54:29
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
